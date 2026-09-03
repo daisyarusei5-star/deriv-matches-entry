@@ -1,7 +1,6 @@
 {
   "name": "deriv-live-entry",
   "version": "1.0.0",
-  "description": "Deriv Live Entry analysis application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
