@@ -1,15 +1,15 @@
 {
   "name": "deriv-live-entry",
-  "version": "2.0.0",
-  "description": "DERIV LIVE ENTRY - Manual Trading Analyzer",
+  "version": "1.0.0",
+  "description": "Deriv Live Entry analysis application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "dotenv": "^16.4.7",
-    "express": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
     "express-session": "^1.18.1",
-    "ws": "^8.18.3"
+    "ws": "^8.18.0"
   }
 }
