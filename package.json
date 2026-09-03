@@ -1,0 +1,15 @@
+{
+  "name": "deriv-live-entry",
+  "version": "1.0.0",
+  "description": "DERIV LIVE ENTRY - POWERED BY ELISY 254",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "ws": "^8.18.3"
+  }
+}
