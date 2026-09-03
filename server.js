@@ -98,12 +98,13 @@ app.post("/api/login", (req, res) => {
     if (err) {
       console.error(
         "[SESSION] Login save error:",
-        err
+        err.message
       );
 
       return res.status(500).json({
         ok: false,
-        message: "Could not create login session."
+        message:
+          "Could not create login session."
       });
     }
 
@@ -115,7 +116,7 @@ app.post("/api/login", (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| Session check
+| Session
 |--------------------------------------------------------------------------
 */
 
@@ -138,7 +139,7 @@ app.post("/api/logout", (req, res) => {
     if (err) {
       console.error(
         "[SESSION] Logout error:",
-        err
+        err.message
       );
 
       return res.status(500).json({
@@ -200,27 +201,14 @@ app.post("/api/unlock-matches", (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| WebSocket one-time authentication tokens
-|--------------------------------------------------------------------------
-|
-| The browser first calls:
-|
-|   GET /api/ws-token
-|
-| while logged in.
-|
-| The server returns a short-lived token.
-|
-| Browser then connects to:
-|
-|   /ws?token=xxxxx
-|
+| WebSocket one-time authentication
 |--------------------------------------------------------------------------
 */
 
 const wsTokens = new Map();
 
-const WS_TOKEN_LIFETIME = 60 * 1000;
+const WS_TOKEN_LIFETIME =
+  60 * 1000;
 
 app.get("/api/ws-token", (req, res) => {
   if (!req.session.loggedIn) {
@@ -230,13 +218,15 @@ app.get("/api/ws-token", (req, res) => {
     });
   }
 
-  const token = crypto
-    .randomBytes(32)
-    .toString("hex");
+  const token =
+    crypto
+      .randomBytes(32)
+      .toString("hex");
 
   wsTokens.set(token, {
     expiresAt:
-      Date.now() + WS_TOKEN_LIFETIME
+      Date.now() +
+      WS_TOKEN_LIFETIME
   });
 
   res.json({
@@ -247,15 +237,19 @@ app.get("/api/ws-token", (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| Cleanup expired WS tokens
+| Cleanup expired WebSocket tokens
 |--------------------------------------------------------------------------
 */
 
 setInterval(() => {
   const now = Date.now();
 
-  for (const [token, info] of wsTokens) {
-    if (info.expiresAt <= now) {
+  for (
+    const [token, info] of wsTokens
+  ) {
+    if (
+      info.expiresAt <= now
+    ) {
       wsTokens.delete(token);
     }
   }
@@ -263,7 +257,16 @@ setInterval(() => {
 
 /*
 |--------------------------------------------------------------------------
-| Deriv shared WebSocket
+| Browser clients
+|--------------------------------------------------------------------------
+*/
+
+const browserClients =
+  new Set();
+
+/*
+|--------------------------------------------------------------------------
+| Deriv connection manager
 |--------------------------------------------------------------------------
 */
 
@@ -271,9 +274,38 @@ let derivSocket = null;
 let derivConnecting = false;
 let derivReconnectTimer = null;
 
-let derivBackoff = 2000;
+let derivBackoff = 30000;
+let derivLastAttempt = 0;
+
+const DERIV_MAX_BACKOFF =
+  5 * 60 * 1000;
+
+const DERIV_MIN_CONNECT_INTERVAL =
+  30000;
+
+/*
+ * Prevent multiple parts of the application
+ * from opening multiple Deriv sockets at once.
+ */
+let derivConnectionPromise = null;
+
+/*
+|--------------------------------------------------------------------------
+| Request IDs
+|--------------------------------------------------------------------------
+*/
 
 let requestId = 1;
+
+function nextRequestId() {
+  return requestId++;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Active symbols
+|--------------------------------------------------------------------------
+*/
 
 let activeSymbols = [];
 let activeSymbolsLoadedAt = 0;
@@ -281,13 +313,7 @@ let activeSymbolsLoadedAt = 0;
 const ACTIVE_SYMBOL_CACHE_MS =
   10 * 60 * 1000;
 
-/*
-|--------------------------------------------------------------------------
-| Browser clients
-|--------------------------------------------------------------------------
-*/
-
-const browserClients = new Set();
+let activeSymbolsRequest = null;
 
 /*
 |--------------------------------------------------------------------------
@@ -317,13 +343,9 @@ const pendingRequests =
 
 /*
 |--------------------------------------------------------------------------
-| Utility
+| Send to Deriv
 |--------------------------------------------------------------------------
 */
-
-function nextRequestId() {
-  return requestId++;
-}
 
 function sendDeriv(payload) {
   if (
@@ -350,7 +372,16 @@ function sendDeriv(payload) {
   }
 }
 
-function sendClient(client, payload) {
+/*
+|--------------------------------------------------------------------------
+| Send to browser
+|--------------------------------------------------------------------------
+*/
+
+function sendClient(
+  client,
+  payload
+) {
   if (
     client &&
     client.readyState ===
@@ -366,13 +397,18 @@ function sendClient(client, payload) {
 
 /*
 |--------------------------------------------------------------------------
-| Broadcast to browser clients
+| Broadcast
 |--------------------------------------------------------------------------
 */
 
 function broadcast(payload) {
-  for (const client of browserClients) {
-    sendClient(client, payload);
+  for (
+    const client of browserClients
+  ) {
+    sendClient(
+      client,
+      payload
+    );
   }
 }
 
@@ -386,164 +422,444 @@ function marketPayload() {
   return {
     type: "markets",
 
-    markets: activeSymbols.map(
-      (market) => ({
-        name: market.name,
-        symbol: market.symbol,
-        pipSize: market.pipSize,
-        precision:
-          precisionFromPipSize(
-            market.pipSize
-          )
-      })
-    )
+    markets:
+      activeSymbols.map(
+        (market) => ({
+          name: market.name,
+          symbol: market.symbol,
+          pipSize:
+            market.pipSize,
+          precision:
+            precisionFromPipSize(
+              market.pipSize
+            )
+        })
+      )
   };
 }
 
 function broadcastMarkets() {
-  broadcast(marketPayload());
+  broadcast(
+    marketPayload()
+  );
 }
 
 /*
 |--------------------------------------------------------------------------
-| Connect Deriv
+| Ensure Deriv connection
 |--------------------------------------------------------------------------
 */
 
-function connectDeriv() {
+function ensureDerivConnection() {
+  /*
+   * Already connected.
+   */
+  if (
+    derivSocket &&
+    derivSocket.readyState ===
+      WebSocket.OPEN
+  ) {
+    return Promise.resolve();
+  }
+
+  /*
+   * Already connecting.
+   */
+  if (derivConnectionPromise) {
+    return derivConnectionPromise;
+  }
+
+  /*
+   * A reconnect timer is already waiting.
+   */
+  if (derivReconnectTimer) {
+    return Promise.reject(
+      new Error(
+        "Deriv connection is waiting for rate-limit backoff."
+      )
+    );
+  }
+
+  derivConnectionPromise =
+    new Promise(
+      (resolve, reject) => {
+        const now =
+          Date.now();
+
+        const elapsed =
+          now -
+          derivLastAttempt;
+
+        const wait =
+          Math.max(
+            0,
+            DERIV_MIN_CONNECT_INTERVAL -
+              elapsed
+          );
+
+        setTimeout(() => {
+          connectDeriv(
+            resolve,
+            reject
+          );
+        }, wait);
+      }
+    ).finally(() => {
+      derivConnectionPromise =
+        null;
+    });
+
+  return derivConnectionPromise;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Connect to Deriv
+|--------------------------------------------------------------------------
+*/
+
+function connectDeriv(
+  resolveConnection,
+  rejectConnection
+) {
   if (derivConnecting) {
     return;
   }
 
   if (
     derivSocket &&
-    derivSocket.readyState ===
-      WebSocket.OPEN
+    (
+      derivSocket.readyState ===
+        WebSocket.OPEN ||
+      derivSocket.readyState ===
+        WebSocket.CONNECTING
+    )
   ) {
     return;
   }
 
-  if (derivReconnectTimer) {
-    clearTimeout(
-      derivReconnectTimer
-    );
-
-    derivReconnectTimer = null;
-  }
-
   derivConnecting = true;
+  derivLastAttempt =
+    Date.now();
 
   console.log(
-    "[DERIV] Connecting..."
+    "[DERIV] Connecting to public market WebSocket..."
   );
 
-  const ws = new WebSocket(
-    DERIV_WS_URL
-  );
+  const ws =
+    new WebSocket(
+      DERIV_WS_URL
+    );
 
   derivSocket = ws;
 
+  let settled = false;
+
+  function resolveOnce() {
+    if (settled) {
+      return;
+    }
+
+    settled = true;
+
+    if (
+      typeof resolveConnection ===
+      "function"
+    ) {
+      resolveConnection();
+    }
+  }
+
+  function rejectOnce(err) {
+    if (settled) {
+      return;
+    }
+
+    settled = true;
+
+    if (
+      typeof rejectConnection ===
+      "function"
+    ) {
+      rejectConnection(err);
+    }
+  }
+
   ws.on("open", async () => {
     derivConnecting = false;
-    derivBackoff = 2000;
+
+    /*
+     * Successful connection.
+     *
+     * Do not go back to a 2-second
+     * reconnect cycle.
+     */
+    derivBackoff = 30000;
 
     console.log(
       "[DERIV] Connected."
     );
 
     try {
-      await loadActiveSymbols(true);
+      /*
+       * Get market list once per connection.
+       */
+      await loadActiveSymbols(
+        true
+      );
 
       console.log(
-        `[DERIV] Active markets: ${activeSymbols.length}`
+        `[DERIV] Active Volatility/Jump markets: ${activeSymbols.length}`
       );
 
       broadcastMarkets();
 
       /*
-       * Re-subscribe all active browser
+       * Restore active browser
        * subscriptions after reconnect.
        */
       resubscribeAll();
+
+      broadcast({
+        type:
+          "deriv_connected"
+      });
+
+      resolveOnce();
     } catch (err) {
       console.error(
-        "[DERIV] Startup error:",
+        "[DERIV] Initialization error:",
         err.message
       );
+
+      rejectOnce(err);
     }
   });
 
   ws.on("message", (raw) => {
-    handleDerivMessage(raw);
+    handleDerivMessage(
+      raw
+    );
   });
 
   ws.on("error", (err) => {
+    const message =
+      String(
+        err?.message || ""
+      );
+
     console.error(
       "[DERIV] WebSocket error:",
-      err.message
+      message
+    );
+
+    /*
+     * HTTP 429 means the Deriv
+     * gateway is rate-limiting us.
+     */
+    if (
+      message.includes("429")
+    ) {
+      derivBackoff =
+        Math.max(
+          derivBackoff,
+          60000
+        );
+
+      console.warn(
+        "[DERIV] Rate limited (429). Increasing backoff."
+      );
+    }
+
+    rejectOnce(
+      new Error(
+        message ||
+          "Deriv WebSocket connection failed."
+      )
     );
   });
 
-  ws.on("close", (code, reason) => {
+  ws.on("close", (
+    code,
+    reason
+  ) => {
     derivConnecting = false;
 
-    if (derivSocket === ws) {
+    if (
+      derivSocket === ws
+    ) {
       derivSocket = null;
     }
 
-    /*
-     * The old Deriv subscription IDs are
-     * no longer reliable after reconnect.
-     */
-    for (const subscription of
-      symbolSubscriptions.values()) {
-      subscription.subscriptionId =
-        null;
-      subscription.requestId = null;
-    }
+    const reasonText =
+      reason
+        ? reason.toString()
+        : "";
 
     console.log(
-      `[DERIV] Closed. code=${code} reason=${reason ? reason.toString() : ""}`
+      `[DERIV] WebSocket closed. code=${code} reason=${reasonText}`
     );
 
-    broadcast({
-      type: "deriv_reconnecting"
-    });
+    /*
+     * Subscription IDs belong to
+     * the previous connection.
+     */
+    for (
+      const subscription of
+        symbolSubscriptions.values()
+    ) {
+      subscription.subscriptionId =
+        null;
 
-    scheduleDerivReconnect();
+      subscription.requestId =
+        null;
+    }
+
+    /*
+     * Only reconnect when somebody
+     * actually needs market data.
+     */
+    if (
+      browserClients.size > 0 ||
+      symbolSubscriptions.size >
+        0
+    ) {
+      broadcast({
+        type:
+          "deriv_reconnecting"
+      });
+
+      scheduleDerivReconnect();
+    }
   });
 }
 
 /*
 |--------------------------------------------------------------------------
-| Reconnect with exponential backoff
+| Schedule Deriv reconnect
 |--------------------------------------------------------------------------
 */
 
 function scheduleDerivReconnect() {
-  if (derivReconnectTimer) {
+  if (
+    derivReconnectTimer
+  ) {
     return;
   }
 
-  const delay = Math.min(
-    derivBackoff,
-    60 * 1000
-  );
+  /*
+   * Nothing needs the connection.
+   */
+  if (
+    browserClients.size === 0 &&
+    symbolSubscriptions.size ===
+      0
+  ) {
+    return;
+  }
+
+  const jitter =
+    Math.floor(
+      Math.random() * 10000
+    );
+
+  const delay =
+    Math.min(
+      derivBackoff,
+      DERIV_MAX_BACKOFF
+    ) + jitter;
 
   console.log(
-    `[DERIV] Reconnecting in ${Math.round(delay / 1000)}s...`
+    `[DERIV] Reconnecting in ${Math.round(
+      delay / 1000
+    )}s...`
   );
 
-  derivReconnectTimer = setTimeout(() => {
-    derivReconnectTimer = null;
+  derivReconnectTimer =
+    setTimeout(() => {
+      derivReconnectTimer =
+        null;
 
-    connectDeriv();
+      if (
+        browserClients.size ===
+          0 &&
+        symbolSubscriptions.size ===
+          0
+      ) {
+        return;
+      }
 
-    derivBackoff = Math.min(
-      derivBackoff * 2,
-      60 * 1000
-    );
-  }, delay);
+      ensureDerivConnection()
+        .catch((err) => {
+          console.error(
+            "[DERIV] Reconnect failed:",
+            err.message
+          );
+
+          scheduleDerivReconnect();
+        });
+
+      derivBackoff =
+        Math.min(
+          derivBackoff * 2,
+          DERIV_MAX_BACKOFF
+        );
+    }, delay);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Request Deriv tick subscription
+|--------------------------------------------------------------------------
+*/
+
+function requestDerivSubscription(
+  symbol,
+  subscription
+) {
+  if (
+    !derivSocket ||
+    derivSocket.readyState !==
+      WebSocket.OPEN
+  ) {
+    return false;
+  }
+
+  /*
+   * Don't create duplicates.
+   */
+  if (
+    subscription.subscriptionId ||
+    subscription.requestId
+  ) {
+    return true;
+  }
+
+  const reqId =
+    nextRequestId();
+
+  subscription.requestId =
+    reqId;
+
+  const sent =
+    sendDeriv({
+      ticks: symbol,
+      subscribe: 1,
+      req_id: reqId
+    });
+
+  if (!sent) {
+    subscription.requestId =
+      null;
+
+    return false;
+  }
+
+  console.log(
+    `[DERIV] Subscribing to ${symbol}`
+  );
+
+  return true;
 }
 
 /*
@@ -562,11 +878,14 @@ function resubscribeAll() {
   }
 
   for (
-    const [symbol, subscription] of
-      symbolSubscriptions
+    const [
+      symbol,
+      subscription
+    ] of symbolSubscriptions
   ) {
     if (
-      subscription.clients.size === 0
+      subscription.clients.size ===
+      0
     ) {
       continue;
     }
@@ -580,47 +899,13 @@ function resubscribeAll() {
 
 /*
 |--------------------------------------------------------------------------
-| Subscribe symbol on Deriv
-|--------------------------------------------------------------------------
-*/
-
-function requestDerivSubscription(
-  symbol,
-  subscription
-) {
-  if (
-    !derivSocket ||
-    derivSocket.readyState !==
-      WebSocket.OPEN
-  ) {
-    return false;
-  }
-
-  const reqId = nextRequestId();
-
-  subscription.requestId = reqId;
-  subscription.subscriptionId = null;
-
-  const sent = sendDeriv({
-    ticks: symbol,
-    subscribe: 1,
-    req_id: reqId
-  });
-
-  if (!sent) {
-    subscription.requestId = null;
-  }
-
-  return sent;
-}
-
-/*
-|--------------------------------------------------------------------------
 | Handle Deriv messages
 |--------------------------------------------------------------------------
 */
 
-function handleDerivMessage(raw) {
+function handleDerivMessage(
+  raw
+) {
   let data;
 
   try {
@@ -628,12 +913,19 @@ function handleDerivMessage(raw) {
       raw.toString()
     );
   } catch {
+    console.error(
+      "[DERIV] Invalid JSON received."
+    );
+
     return;
   }
 
   /*
-   * Active symbols
-   */
+  |--------------------------------------------------------------------------
+  | Active symbols
+  |--------------------------------------------------------------------------
+  */
+
   if (
     data.msg_type ===
     "active_symbols"
@@ -645,63 +937,67 @@ function handleDerivMessage(raw) {
         ? data.active_symbols
         : [];
 
-    activeSymbols = list
-      .filter((item) => {
-        const name = String(
-          item.underlying_symbol_name ||
-            ""
-        );
+    activeSymbols =
+      list
+        .filter((item) => {
+          const name =
+            String(
+              item.underlying_symbol_name ||
+                ""
+            );
 
-        return /volatility|jump/i.test(
-          name
-        );
-      })
-      .filter(
-        (item) =>
-          item.underlying_symbol
-      )
-      .map((item) => ({
-        symbol:
-          item.underlying_symbol,
-
-        name:
-          item.underlying_symbol_name,
-
-        pipSize:
-          Number(
-            item.pip_size || 0
-          ),
-
-        market:
-          item.market || "",
-
-        subgroup:
-          item.subgroup || "",
-
-        submarket:
-          item.submarket || "",
-
-        exchangeOpen:
-          item.exchange_is_open !==
-          0,
-
-        suspended:
-          item.is_trading_suspended ===
-          1
-      }))
-      .filter(
-        (item) => !item.suspended
-      )
-      .sort((a, b) =>
-        a.name.localeCompare(
-          b.name,
-          undefined,
-          {
-            numeric: true,
-            sensitivity: "base"
-          }
+          return /volatility|jump/i.test(
+            name
+          );
+        })
+        .filter(
+          (item) =>
+            item.underlying_symbol
         )
-      );
+        .map((item) => ({
+          symbol:
+            item.underlying_symbol,
+
+          name:
+            item.underlying_symbol_name,
+
+          pipSize:
+            Number(
+              item.pip_size || 0
+            ),
+
+          market:
+            item.market || "",
+
+          subgroup:
+            item.subgroup || "",
+
+          submarket:
+            item.submarket || "",
+
+          exchangeOpen:
+            item.exchange_is_open !==
+            0,
+
+          suspended:
+            item.is_trading_suspended ===
+            1
+        }))
+        .filter(
+          (item) =>
+            !item.suspended
+        )
+        .sort((a, b) =>
+          a.name.localeCompare(
+            b.name,
+            undefined,
+            {
+              numeric: true,
+              sensitivity:
+                "base"
+            }
+          )
+        );
 
     activeSymbolsLoadedAt =
       Date.now();
@@ -717,13 +1013,17 @@ function handleDerivMessage(raw) {
   }
 
   /*
-   * Tick
-   */
+  |--------------------------------------------------------------------------
+  | Tick
+  |--------------------------------------------------------------------------
+  */
+
   if (
     data.msg_type === "tick" &&
     data.tick
   ) {
-    const tick = data.tick;
+    const tick =
+      data.tick;
 
     const symbol =
       tick.symbol;
@@ -743,7 +1043,7 @@ function handleDerivMessage(raw) {
 
     /*
      * IMPORTANT:
-     * Capture the Deriv subscription ID.
+     * Save the Deriv subscription ID.
      */
     if (
       data.subscription &&
@@ -752,10 +1052,13 @@ function handleDerivMessage(raw) {
       subscription.subscriptionId =
         data.subscription.id;
 
+      subscription.requestId =
+        null;
+
       /*
-       * If everyone stopped while the
-       * subscribe request was pending,
-       * immediately forget it.
+       * User may have stopped while
+       * the subscription was being
+       * established.
        */
       if (
         subscription.clients.size ===
@@ -777,45 +1080,55 @@ function handleDerivMessage(raw) {
     const market =
       activeSymbols.find(
         (item) =>
-          item.symbol === symbol
+          item.symbol ===
+          symbol
       );
 
     const pipSize =
       Number(
         tick.pip_size || 0
       ) ||
-      (market
-        ? Number(
-            market.pipSize || 0
-          )
-        : 0);
+      (
+        market
+          ? Number(
+              market.pipSize ||
+                0
+            )
+          : 0
+      );
 
     const payload = {
       type: "tick",
 
-      market: market
-        ? market.name
-        : symbol,
+      market:
+        market
+          ? market.name
+          : symbol,
 
       symbol,
 
-      quote: tick.quote,
+      quote:
+        tick.quote,
 
-      epoch: tick.epoch,
+      epoch:
+        tick.epoch,
 
       pipSize,
 
-      precision: market
-        ? precisionFromPipSize(
-            market.pipSize
-          )
-        : precisionFromPipSize(
-            tick.pip_size
-          )
+      precision:
+        market
+          ? precisionFromPipSize(
+              market.pipSize
+            )
+          : precisionFromPipSize(
+              tick.pip_size
+            )
     };
 
-    for (const client of
-      subscription.clients) {
+    for (
+      const client of
+        subscription.clients
+    ) {
       sendClient(
         client,
         payload
@@ -826,8 +1139,11 @@ function handleDerivMessage(raw) {
   }
 
   /*
-   * Errors
-   */
+  |--------------------------------------------------------------------------
+  | Deriv errors
+  |--------------------------------------------------------------------------
+  */
+
   if (data.error) {
     console.error(
       "[DERIV] API error:",
@@ -841,8 +1157,8 @@ function handleDerivMessage(raw) {
     );
 
     /*
-     * Find subscription associated
-     * with failed request.
+     * Match failed subscription
+     * request.
      */
     for (
       const [
@@ -857,13 +1173,17 @@ function handleDerivMessage(raw) {
         subscription.requestId =
           null;
 
-        for (const client of
-          subscription.clients) {
+        for (
+          const client of
+            subscription.clients
+        ) {
           sendClient(client, {
-            type: "deriv_error",
+            type:
+              "deriv_error",
 
             message:
-              data.error.message ||
+              data.error
+                .message ||
               "Deriv market data error."
           });
         }
@@ -873,8 +1193,8 @@ function handleDerivMessage(raw) {
     }
 
     /*
-     * Also support errors containing
-     * echo_req.ticks.
+     * Also handle errors where
+     * echo_req.ticks is available.
      */
     if (
       data.echo_req &&
@@ -889,13 +1209,17 @@ function handleDerivMessage(raw) {
         );
 
       if (subscription) {
-        for (const client of
-          subscription.clients) {
+        for (
+          const client of
+            subscription.clients
+        ) {
           sendClient(client, {
-            type: "deriv_error",
+            type:
+              "deriv_error",
 
             message:
-              data.error.message ||
+              data.error
+                .message ||
               "Deriv market data error."
           });
         }
@@ -913,7 +1237,7 @@ function handleDerivMessage(raw) {
 
 /*
 |--------------------------------------------------------------------------
-| Resolve request
+| Resolve pending request
 |--------------------------------------------------------------------------
 */
 
@@ -943,11 +1267,9 @@ function resolveRequest(
 
 /*
 |--------------------------------------------------------------------------
-| Active symbols
+| Load active symbols
 |--------------------------------------------------------------------------
 */
-
-let activeSymbolsRequest = null;
 
 function loadActiveSymbols(
   force = false
@@ -967,28 +1289,28 @@ function loadActiveSymbols(
     );
   }
 
+  /*
+   * Don't send duplicate requests.
+   */
   if (activeSymbolsRequest) {
     return activeSymbolsRequest;
+  }
+
+  if (
+    !derivSocket ||
+    derivSocket.readyState !==
+      WebSocket.OPEN
+  ) {
+    return Promise.reject(
+      new Error(
+        "Deriv WebSocket is not connected."
+      )
+    );
   }
 
   activeSymbolsRequest =
     new Promise(
       (resolve, reject) => {
-        if (
-          !derivSocket ||
-          derivSocket.readyState !==
-            WebSocket.OPEN
-        ) {
-          activeSymbolsRequest =
-            null;
-
-          return reject(
-            new Error(
-              "Deriv WebSocket is not connected."
-            )
-          );
-        }
-
         const reqId =
           nextRequestId();
 
@@ -1032,11 +1354,14 @@ function loadActiveSymbols(
             active_symbols:
               "brief",
 
-            req_id: reqId
+            req_id:
+              reqId
           });
 
         if (!sent) {
-          clearTimeout(timer);
+          clearTimeout(
+            timer
+          );
 
           pendingRequests.delete(
             reqId
@@ -1083,7 +1408,10 @@ function precisionFromPipSize(
 
   return Math.max(
     0,
-    Math.min(decimals, 10)
+    Math.min(
+      decimals,
+      10
+    )
   );
 }
 
@@ -1116,6 +1444,17 @@ function resolveExactMarket(
       marketName
     );
 
+  /*
+   * Exact normalized name.
+   *
+   * This deliberately keeps:
+   *
+   * Volatility 75
+   *
+   * different from:
+   *
+   * Volatility 75 (1s)
+   */
   let found =
     activeSymbols.find(
       (item) =>
@@ -1128,10 +1467,19 @@ function resolveExactMarket(
     return found;
   }
 
+  /*
+   * Conservative fallback.
+   */
   const compact =
     requested
-      .replace(/[–—]/g, "-")
-      .replace(/\s+/g, "");
+      .replace(
+        /[–—]/g,
+        "-"
+      )
+      .replace(
+        /\s+/g,
+        ""
+      );
 
   found =
     activeSymbols.find(
@@ -1150,7 +1498,8 @@ function resolveExactMarket(
             );
 
         return (
-          candidate === compact
+          candidate ===
+          compact
         );
       }
     );
@@ -1168,19 +1517,46 @@ async function subscribeClientToMarket(
   client,
   marketName
 ) {
+  /*
+   * Ensure there is exactly one
+   * shared Deriv connection.
+   */
+  try {
+    await ensureDerivConnection();
+  } catch (err) {
+    sendClient(client, {
+      type:
+        "market_error",
+
+      message:
+        "Deriv market connection is temporarily unavailable. Please try again shortly."
+    });
+
+    return;
+  }
+
+  /*
+   * Load markets.
+   */
   try {
     await loadActiveSymbols(
       false
     );
   } catch (err) {
     sendClient(client, {
-      type: "market_error",
-      message: err.message
+      type:
+        "market_error",
+
+      message:
+        err.message
     });
 
     return;
   }
 
+  /*
+   * Resolve exact market.
+   */
   const market =
     resolveExactMarket(
       marketName
@@ -1188,7 +1564,9 @@ async function subscribeClientToMarket(
 
   if (!market) {
     sendClient(client, {
-      type: "market_error",
+      type:
+        "market_error",
+
       message:
         "That market is not currently active on Deriv."
     });
@@ -1197,7 +1575,8 @@ async function subscribeClientToMarket(
   }
 
   /*
-   * Remove old market first.
+   * Remove old browser
+   * subscription first.
    */
   unsubscribeClientFromAllMarkets(
     client
@@ -1208,12 +1587,22 @@ async function subscribeClientToMarket(
       market.symbol
     );
 
+  /*
+   * Create one shared subscription.
+   */
   if (!subscription) {
     subscription = {
-      symbol: market.symbol,
-      subscriptionId: null,
-      requestId: null,
-      clients: new Set()
+      symbol:
+        market.symbol,
+
+      subscriptionId:
+        null,
+
+      requestId:
+        null,
+
+      clients:
+        new Set()
     };
 
     symbolSubscriptions.set(
@@ -1222,15 +1611,34 @@ async function subscribeClientToMarket(
     );
 
     /*
-     * Create one Deriv subscription
-     * for this symbol.
+     * One Deriv tick subscription.
      */
-    requestDerivSubscription(
-      market.symbol,
-      subscription
-    );
+    const subscribed =
+      requestDerivSubscription(
+        market.symbol,
+        subscription
+      );
+
+    if (!subscribed) {
+      symbolSubscriptions.delete(
+        market.symbol
+      );
+
+      sendClient(client, {
+        type:
+          "market_error",
+
+        message:
+          "Could not subscribe to the Deriv market."
+      });
+
+      return;
+    }
   }
 
+  /*
+   * Add browser to shared stream.
+   */
   subscription.clients.add(
     client
   );
@@ -1242,13 +1650,17 @@ async function subscribeClientToMarket(
     market.name;
 
   sendClient(client, {
-    type: "market_connected",
+    type:
+      "market_connected",
 
-    market: market.name,
+    market:
+      market.name,
 
-    symbol: market.symbol,
+    symbol:
+      market.symbol,
 
-    pipSize: market.pipSize,
+    pipSize:
+      market.pipSize,
 
     precision:
       precisionFromPipSize(
@@ -1259,7 +1671,7 @@ async function subscribeClientToMarket(
 
 /*
 |--------------------------------------------------------------------------
-| Remove client subscriptions
+| Remove browser from subscriptions
 |--------------------------------------------------------------------------
 */
 
@@ -1281,14 +1693,13 @@ function unsubscribeClientFromAllMarkets(
         client
       );
 
+      /*
+       * Nobody is using this symbol.
+       */
       if (
         subscription.clients.size ===
         0
       ) {
-        /*
-         * Only forget when nobody is
-         * using the symbol.
-         */
         forgetSubscription(
           symbol,
           subscription
@@ -1301,8 +1712,11 @@ function unsubscribeClientFromAllMarkets(
     }
   }
 
-  client.currentSymbol = null;
-  client.currentMarket = null;
+  client.currentSymbol =
+    null;
+
+  client.currentMarket =
+    null;
 }
 
 /*
@@ -1315,9 +1729,7 @@ function forgetSubscription(
   symbol,
   subscription
 ) {
-  if (
-    !subscription
-  ) {
+  if (!subscription) {
     return;
   }
 
@@ -1346,7 +1758,7 @@ function forgetSubscription(
 
 /*
 |--------------------------------------------------------------------------
-| Browser WebSocket
+| WebSocket server
 |--------------------------------------------------------------------------
 */
 
@@ -1372,9 +1784,11 @@ server.on(
         );
 
       /*
-       * Only allow our /ws endpoint.
+       * Only /ws is accepted.
        */
-      if (url.pathname !== "/ws") {
+      if (
+        url.pathname !== "/ws"
+      ) {
         socket.write(
           "HTTP/1.1 404 Not Found\r\n\r\n"
         );
@@ -1400,12 +1814,16 @@ server.on(
       }
 
       const tokenInfo =
-        wsTokens.get(token);
+        wsTokens.get(
+          token
+        );
 
       /*
        * One-time token.
        */
-      wsTokens.delete(token);
+      wsTokens.delete(
+        token
+      );
 
       if (
         !tokenInfo ||
@@ -1449,14 +1867,30 @@ server.on(
 
 /*
 |--------------------------------------------------------------------------
-| Browser connection
+| Browser WebSocket connection
 |--------------------------------------------------------------------------
 */
 
 wss.on(
   "connection",
   (client) => {
-    browserClients.add(client);
+    /*
+     * Extra safety check.
+     */
+    if (
+      !client.authenticated
+    ) {
+      client.close(
+        1008,
+        "Unauthorized"
+      );
+
+      return;
+    }
+
+    browserClients.add(
+      client
+    );
 
     client.currentSymbol =
       null;
@@ -1465,19 +1899,23 @@ wss.on(
       null;
 
     /*
-     * Make sure Deriv is alive.
+     * Tell frontend authentication
+     * succeeded.
      */
-    connectDeriv();
-
     sendClient(client, {
-      type: "hello",
-      authenticated: true
+      type:
+        "hello",
+
+      authenticated:
+        true
     });
 
     /*
-     * Send markets immediately if cached.
+     * Send cached markets immediately.
      */
-    if (activeSymbols.length) {
+    if (
+      activeSymbols.length
+    ) {
       sendClient(
         client,
         marketPayload()
@@ -1485,7 +1923,7 @@ wss.on(
     }
 
     /*
-     * Browser requests
+     * Browser messages.
      */
     client.on(
       "message",
@@ -1504,12 +1942,15 @@ wss.on(
         let data;
 
         try {
-          data = JSON.parse(
-            raw.toString()
-          );
+          data =
+            JSON.parse(
+              raw.toString()
+            );
         } catch {
           sendClient(client, {
-            type: "error",
+            type:
+              "error",
+
             message:
               "Invalid message."
           });
@@ -1518,13 +1959,19 @@ wss.on(
         }
 
         /*
-         * Markets
+         * Request market list.
          */
         if (
           data.action ===
           "markets"
         ) {
           try {
+            /*
+             * If there is no Deriv
+             * connection, create one.
+             */
+            await ensureDerivConnection();
+
             await loadActiveSymbols(
               false
             );
@@ -1535,7 +1982,9 @@ wss.on(
             );
           } catch (err) {
             sendClient(client, {
-              type: "market_error",
+              type:
+                "market_error",
+
               message:
                 err.message
             });
@@ -1545,10 +1994,11 @@ wss.on(
         }
 
         /*
-         * Start
+         * Start market stream.
          */
         if (
-          data.action === "start"
+          data.action ===
+          "start"
         ) {
           const marketName =
             String(
@@ -1558,7 +2008,9 @@ wss.on(
 
           if (!marketName) {
             sendClient(client, {
-              type: "market_error",
+              type:
+                "market_error",
+
               message:
                 "Please select a market."
             });
@@ -1575,27 +2027,38 @@ wss.on(
         }
 
         /*
-         * Stop
+         * Stop market stream.
          */
         if (
-          data.action === "stop"
+          data.action ===
+          "stop"
         ) {
           unsubscribeClientFromAllMarkets(
             client
           );
 
           sendClient(client, {
-            type: "market_stopped"
+            type:
+              "market_stopped"
           });
+
+          /*
+           * If absolutely nobody is
+           * using Deriv anymore, close
+           * the shared connection.
+           */
+          shutdownDerivIfUnused();
 
           return;
         }
 
         /*
-         * Unknown action
+         * Unknown command.
          */
         sendClient(client, {
-          type: "error",
+          type:
+            "error",
+
           message:
             "Unknown WebSocket action."
         });
@@ -1603,44 +2066,101 @@ wss.on(
     );
 
     /*
-     * Connection closed
+     * Browser disconnected.
      */
-    client.on("close", () => {
-      unsubscribeClientFromAllMarkets(
-        client
-      );
+    client.on(
+      "close",
+      () => {
+        unsubscribeClientFromAllMarkets(
+          client
+        );
 
-      browserClients.delete(
-        client
-      );
-    });
+        browserClients.delete(
+          client
+        );
 
-    client.on("error", () => {
-      unsubscribeClientFromAllMarkets(
-        client
-      );
+        shutdownDerivIfUnused();
+      }
+    );
 
-      browserClients.delete(
-        client
-      );
-    });
+    /*
+     * Browser error.
+     */
+    client.on(
+      "error",
+      () => {
+        unsubscribeClientFromAllMarkets(
+          client
+        );
+
+        browserClients.delete(
+          client
+        );
+
+        shutdownDerivIfUnused();
+      }
+    );
   }
 );
 
 /*
 |--------------------------------------------------------------------------
-| Pending request cleanup
+| Shut down unused Deriv connection
+|--------------------------------------------------------------------------
+*/
+
+function shutdownDerivIfUnused() {
+  if (
+    browserClients.size > 0 ||
+    symbolSubscriptions.size > 0
+  ) {
+    return;
+  }
+
+  if (
+    derivReconnectTimer
+  ) {
+    clearTimeout(
+      derivReconnectTimer
+    );
+
+    derivReconnectTimer =
+      null;
+  }
+
+  if (
+    derivSocket &&
+    (
+      derivSocket.readyState ===
+        WebSocket.OPEN ||
+      derivSocket.readyState ===
+        WebSocket.CONNECTING
+    )
+  ) {
+    console.log(
+      "[DERIV] No active clients. Closing shared connection."
+    );
+
+    try {
+      derivSocket.close(
+        1000,
+        "No active clients"
+      );
+    } catch {}
+
+    return;
+  }
+
+  derivSocket = null;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Pending request safety monitor
 |--------------------------------------------------------------------------
 */
 
 setInterval(() => {
-  /*
-   * Prevent the map from growing forever
-   * if an upstream request disappears.
-   *
-   * Individual requests already have their
-   * own timeout, so this is just a safety net.
-   */
   if (
     pendingRequests.size >
     1000
@@ -1650,6 +2170,49 @@ setInterval(() => {
     );
   }
 }, 60 * 1000).unref();
+
+/*
+|--------------------------------------------------------------------------
+| Graceful shutdown
+|--------------------------------------------------------------------------
+*/
+
+function shutdown(signal) {
+  console.log(
+    `[SERVER] ${signal} received. Shutting down...`
+  );
+
+  if (derivSocket) {
+    try {
+      derivSocket.close(
+        1000,
+        "Server shutdown"
+      );
+    } catch {}
+  }
+
+  server.close(() => {
+    console.log(
+      "[SERVER] Shutdown complete."
+    );
+
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    process.exit(0);
+  }, 5000).unref();
+}
+
+process.on(
+  "SIGINT",
+  () => shutdown("SIGINT")
+);
+
+process.on(
+  "SIGTERM",
+  () => shutdown("SIGTERM")
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -1664,6 +2227,8 @@ server.listen(
       `DERIV LIVE ENTRY running on port ${PORT}`
     );
 
-    connectDeriv();
+    console.log(
+      "[DERIV] Waiting for a market-data request before connecting."
+    );
   }
 );
