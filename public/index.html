@@ -2,855 +2,485 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>DERIV LIVE ENTRY</title>
 
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #05080d;
-      --panel: #0b111a;
-      --panel2: #101823;
-      --border: #1c2a3a;
-      --text: #edf4ff;
-      --muted: #8190a5;
-      --green: #18d878;
-      --red: #ff4d67;
-      --yellow: #ffc857;
-      --blue: #3fa9ff;
-      --purple: #9b6cff;
     }
 
     body {
+      margin: 0;
       min-height: 100vh;
+      font-family: Inter, Arial, Helvetica, sans-serif;
       background:
         radial-gradient(
-          circle at top right,
-          rgba(38, 117, 255, 0.09),
-          transparent 35%
-        ),
-        radial-gradient(
-          circle at bottom left,
-          rgba(0, 255, 153, 0.05),
-          transparent 30%
-        ),
-        var(--bg);
-      color: var(--text);
-      font-family:
-        Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+          circle at top,
+          #14213d 0%,
+          #07101f 45%,
+          #02060d 100%
+        );
+      color: #ffffff;
     }
 
     button,
-    input,
-    select {
+    select,
+    input {
       font: inherit;
     }
 
+    .app {
+      width: min(1150px, 94%);
+      margin: 0 auto;
+      padding: 22px 0 50px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 18px 10px 25px;
+    }
+
+    .brand {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .powered {
+      margin-top: 5px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      opacity: 0.65;
+    }
+
+    .card {
+      background: rgba(9, 18, 33, 0.9);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 12px;
+    }
+
+    .login-card {
+      max-width: 460px;
+      margin: 30px auto;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 13px 14px;
+      background: #0d192b;
+      color: white;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #4da3ff;
+    }
+
     button {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 18px;
       cursor: pointer;
+      font-weight: 800;
+      color: white;
+      background: #1976d2;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .start {
+      background: #168a4b;
+    }
+
+    .stop {
+      background: #b32635;
+    }
+
+    .manual {
+      background: #1976d2;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .whatsapp {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      background: #168a4b;
+      color: white;
+      padding: 13px;
+      border-radius: 12px;
+      font-weight: 800;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .market-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .live-market {
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    .connection {
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: #3a4352;
+    }
+
+    .connection.live {
+      background: #0d7040;
+    }
+
+    .connection.wait {
+      background: #725b13;
+    }
+
+    .momentum-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 10px;
+    }
+
+    .digit-card {
+      text-align: center;
+    }
+
+    .digit-circle {
+      width: 72px;
+      height: 72px;
+      max-width: 100%;
+      margin: auto;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 900;
+      border: 3px solid #287fc8;
+      background:
+        radial-gradient(
+          circle at 35% 25%,
+          #279fff,
+          #07548e
+        );
+      box-shadow: 0 0 16px rgba(32,151,255,0.25);
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+    }
+
+    .digit-circle.pulse {
+      transform: scale(1.08);
+    }
+
+    .digit-circle.green {
+      border-color: #2dd879;
+      background:
+        radial-gradient(
+          circle at 35% 25%,
+          #42ef91,
+          #087b3d
+        );
+      box-shadow: 0 0 18px rgba(45,216,121,0.35);
+    }
+
+    .digit-circle.blue {
+      border-color: #2c98ee;
+      background:
+        radial-gradient(
+          circle at 35% 25%,
+          #43b1ff,
+          #07548e
+        );
+    }
+
+    .digit-circle.yellow {
+      border-color: #e8c547;
+      background:
+        radial-gradient(
+          circle at 35% 25%,
+          #ffe56a,
+          #8c7100
+        );
+    }
+
+    .digit-circle.red {
+      border-color: #ef5350;
+      background:
+        radial-gradient(
+          circle at 35% 25%,
+          #ff6f6b,
+          #8c1717
+        );
+    }
+
+    .digit-label {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      opacity: 0.7;
+    }
+
+    .entry-box {
+      border: 2px solid #1c83d8;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(21,70,112,0.35),
+          rgba(6,15,28,0.95)
+        );
+    }
+
+    .entry-status {
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 900;
+      opacity: 0.7;
+      text-align: center;
+    }
+
+    .entry-contract {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 15px;
+      font-weight: 900;
+      opacity: 0.75;
+    }
+
+    .prediction {
+      text-align: center;
+      font-size: clamp(50px, 9vw, 90px);
+      font-weight: 1000;
+      letter-spacing: 5px;
+      margin: 10px 0;
+      line-height: 1;
+    }
+
+    .reason {
+      text-align: center;
+      max-width: 720px;
+      margin: 15px auto;
+      color: #cbd7e6;
+      line-height: 1.5;
+    }
+
+    .manual-help {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      color: #d9e5f4;
+      line-height: 1.5;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .timer {
+      margin-top: 18px;
+      text-align: center;
+    }
+
+    .timer-label {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      opacity: 0.65;
+    }
+
+    .timer-value {
+      margin-top: 4px;
+      font-size: 52px;
+      font-weight: 1000;
+    }
+
+    .timer.active .timer-value {
+      color: #5de69a;
+    }
+
+    .timer.warning .timer-value {
+      color: #ffd84d;
+    }
+
+    .timer.expired .timer-value {
+      color: #ff5555;
+    }
+
+    .dont-trade {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      border: 2px solid #c5293b;
+      border-radius: 16px;
+      background: rgba(125, 17, 34, 0.2);
+    }
+
+    .dont-trade.show {
+      display: block;
+    }
+
+    .dont-title {
+      font-size: 25px;
+      font-weight: 1000;
+      color: #ff5b67;
+    }
+
+    .dont-message {
+      margin-top: 7px;
+      opacity: 0.8;
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 12px;
+    }
+
+    .win {
+      color: #4de08c;
+      font-weight: 900;
+    }
+
+    .loss {
+      color: #ff5e69;
+      font-weight: 900;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .stat {
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 25px;
+      font-weight: 1000;
+    }
+
+    .stat-label {
+      margin-top: 4px;
+      font-size: 10px;
+      opacity: 0.6;
+      letter-spacing: 1px;
+    }
+
+    .locked {
+      background: #222c3c;
+      color: #aeb9c8;
+    }
+
+    .unlock-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 10px;
     }
 
     .hidden {
       display: none !important;
     }
 
-    /* ==================================================
-       LOGIN
-       ================================================== */
-
-    #loginScreen {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 430px;
-      background: rgba(11, 17, 26, 0.96);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 30px;
-      box-shadow:
-        0 25px 80px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    }
-
-    .brand {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .brand-icon {
-      width: 68px;
-      height: 68px;
-      margin: 0 auto 15px;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(
-        135deg,
-        #13d875,
-        #087bff
-      );
-      color: white;
-      font-size: 28px;
-      font-weight: 900;
-      box-shadow: 0 10px 30px rgba(24, 216, 120, 0.18);
-    }
-
-    .brand h1 {
-      font-size: 26px;
-      letter-spacing: 1px;
-    }
-
-    .brand p {
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 2px;
-    }
-
-    .field {
-      margin-bottom: 16px;
-    }
-
-    .field label {
-      display: block;
-      margin-bottom: 8px;
-      color: #9eacc0;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-
-    .field input,
-    .field select {
-      width: 100%;
-      height: 48px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #070d14;
-      color: white;
-      padding: 0 14px;
-      outline: none;
-    }
-
-    .field input:focus,
-    .field select:focus {
-      border-color: var(--blue);
-    }
-
-    .primary-btn {
-      width: 100%;
-      height: 50px;
-      border: 0;
-      border-radius: 12px;
-      background: linear-gradient(
-        135deg,
-        #18d878,
-        #0b9e61
-      );
-      color: #00170d;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-    }
-
-    .primary-btn:disabled {
+    .muted {
       opacity: 0.55;
-      cursor: not-allowed;
     }
 
-    .login-error {
-      margin-top: 14px;
-      padding: 11px;
-      border-radius: 10px;
-      background: rgba(255, 77, 103, 0.08);
-      border: 1px solid rgba(255, 77, 103, 0.2);
-      color: #ff8295;
-      font-size: 13px;
-      text-align: center;
-    }
-
-    /* ==================================================
-       APP
-       ================================================== */
-
-    #appScreen {
-      min-height: 100vh;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      border-bottom: 1px solid var(--border);
-      background: rgba(5, 8, 13, 0.93);
-      backdrop-filter: blur(15px);
-    }
-
-    .topbar-inner {
-      width: 100%;
-      max-width: 1250px;
-      margin: auto;
-      min-height: 74px;
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    .top-brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-    }
-
-    .mini-logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(
-        135deg,
-        #18d878,
-        #1677ff
-      );
-      font-weight: 900;
-    }
-
-    .top-brand strong {
-      display: block;
-      font-size: 14px;
-      letter-spacing: 0.8px;
-    }
-
-    .top-brand span {
-      display: block;
-      color: var(--muted);
-      font-size: 10px;
-      margin-top: 3px;
-      letter-spacing: 1.3px;
-    }
-
-    .connection {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      color: var(--muted);
-      font-size: 11px;
-      text-transform: uppercase;
-    }
-
-    .connection-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--red);
-      box-shadow: 0 0 12px rgba(255, 77, 103, 0.5);
-    }
-
-    .connection-dot.online {
-      background: var(--green);
-      box-shadow: 0 0 12px rgba(24, 216, 120, 0.6);
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1250px;
-      margin: auto;
-      padding: 22px 18px 50px;
-    }
-
-    /* ==================================================
-       CONTROL PANEL
-       ================================================== */
-
-    .panel {
-      background: rgba(11, 17, 26, 0.92);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 16px;
-    }
-
-    .panel-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .panel-title h2 {
-      font-size: 14px;
-      letter-spacing: 0.6px;
-    }
-
-    .panel-title span {
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .controls-grid {
-      display: grid;
-      grid-template-columns:
-        minmax(180px, 1.6fr)
-        minmax(140px, 1fr)
-        minmax(140px, 1fr)
-        auto;
-      gap: 12px;
-    }
-
-    .control-group label {
-      display: block;
-      margin-bottom: 7px;
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-
-    .control-group select {
-      width: 100%;
-      height: 46px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      background: #070d14;
-      color: white;
-      padding: 0 12px;
-      outline: none;
-    }
-
-    .control-group select:focus {
-      border-color: var(--blue);
-    }
-
-    .action-buttons {
-      display: flex;
-      align-items: end;
-      gap: 8px;
-    }
-
-    .btn {
-      height: 46px;
-      padding: 0 20px;
-      border: 0;
-      border-radius: 11px;
-      font-weight: 900;
-      font-size: 12px;
-    }
-
-    .btn-start {
-      background: var(--green);
-      color: #00150b;
-    }
-
-    .btn-stop {
-      background: #202a37;
-      color: white;
-      border: 1px solid #2a3849;
-    }
-
-    .btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    /* ==================================================
-       STATUS
-       ================================================== */
-
-    .status-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .status-box {
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 11px 13px;
-      background: #080e16;
-    }
-
-    .status-box small {
-      color: var(--muted);
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-    }
-
-    .status-box strong {
-      display: block;
-      margin-top: 5px;
-      font-size: 13px;
-    }
-
-    /* ==================================================
-       SIGNAL
-       ================================================== */
-
-    .signal-card {
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-      background:
-        linear-gradient(
-          145deg,
-          rgba(17, 29, 43, 0.98),
-          rgba(7, 13, 20, 0.98)
-        );
-    }
-
-    .signal-card::after {
-      content: "";
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      right: -80px;
-      top: -90px;
-      border-radius: 50%;
-      background: rgba(24, 216, 120, 0.07);
-      pointer-events: none;
-    }
-
-    .signal-label {
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-    }
-
-    #predictedDigit {
-      margin-top: 7px;
-      font-size: 66px;
-      line-height: 1;
-      font-weight: 950;
-      letter-spacing: -4px;
-    }
-
-    #signalText {
-      margin-top: 9px;
-      font-size: 13px;
-      color: var(--green);
-      font-weight: 800;
-    }
-
-    .timer-wrap {
-      margin: 17px auto 0;
-      max-width: 400px;
-    }
-
-    .timer-bar {
-      width: 100%;
-      height: 6px;
-      overflow: hidden;
-      border-radius: 99px;
-      background: #172231;
-    }
-
-    #timerProgress {
-      width: 0%;
-      height: 100%;
-      background: var(--green);
-      transition: width 0.2s linear;
-    }
-
-    #timerText {
-      display: block;
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    /* ==================================================
-       DIGITS
-       ================================================== */
-
-    .digits-grid {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 8px;
-    }
-
-    .digit-card {
-      min-height: 85px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: #080e16;
-      padding: 10px 6px;
-      text-align: center;
-    }
-
-    .digit-number {
-      font-size: 20px;
-      font-weight: 900;
-    }
-
-    .digit-count {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 10px;
-    }
-
-    .digit-bar {
-      height: 4px;
+    .message {
       margin-top: 10px;
-      border-radius: 99px;
-      background: #172231;
-      overflow: hidden;
-    }
-
-    .digit-bar span {
-      display: block;
-      width: 0%;
-      height: 100%;
-      background: var(--blue);
-      transition: width 0.3s ease;
-    }
-
-    .digit-card.selected {
-      border-color: rgba(24, 216, 120, 0.55);
-      background: rgba(24, 216, 120, 0.07);
-    }
-
-    /* ==================================================
-       DATA CARDS
-       ================================================== */
-
-    .data-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .data-card {
-      padding: 15px;
-      border-radius: 13px;
-      background: #080e16;
-      border: 1px solid var(--border);
-    }
-
-    .data-card small {
-      color: var(--muted);
-      text-transform: uppercase;
-      font-size: 9px;
-      letter-spacing: 0.7px;
-    }
-
-    .data-card strong {
-      display: block;
-      margin-top: 8px;
-      font-size: 18px;
-    }
-
-    /* ==================================================
-       MATCHES
-       ================================================== */
-
-    .matches-panel {
-      border-color: rgba(155, 108, 255, 0.25);
-    }
-
-    .matches-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .lock-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 9px;
-      border-radius: 99px;
-      background: rgba(155, 108, 255, 0.1);
-      color: #bd9cff;
-      font-size: 10px;
-      font-weight: 800;
-    }
-
-    .activation-box {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 12px;
-      background: #080e16;
-      border: 1px solid var(--border);
-    }
-
-    .activation-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .activation-row input {
-      flex: 1;
-      min-width: 0;
-      height: 43px;
-      padding: 0 12px;
-      border-radius: 10px;
-      background: #050a10;
-      border: 1px solid var(--border);
-      color: white;
-      outline: none;
-    }
-
-    .activation-row button {
-      height: 43px;
-      padding: 0 16px;
-      border: 0;
-      border-radius: 10px;
-      background: var(--purple);
-      color: white;
-      font-weight: 800;
-      font-size: 11px;
-    }
-
-    .whatsapp {
-      display: inline-flex;
-      margin-top: 12px;
-      padding: 9px 12px;
-      border-radius: 9px;
-      text-decoration: none;
-      background: #0d2419;
-      border: 1px solid #1b5c3d;
-      color: #65eaa5;
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .matches-status {
-      margin-top: 9px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    /* ==================================================
-       HISTORY
-       ================================================== */
-
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .history-empty {
-      padding: 25px;
+      font-size: 13px;
       text-align: center;
-      color: var(--muted);
-      font-size: 12px;
-      border: 1px dashed var(--border);
-      border-radius: 12px;
+      color: #ff8992;
     }
 
-    .history-item {
-      display: grid;
-      grid-template-columns: 55px 1fr auto;
-      align-items: center;
-      gap: 12px;
-      padding: 11px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      background: #080e16;
-    }
-
-    .history-digit {
-      width: 43px;
-      height: 43px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      background: #111b28;
-      font-size: 20px;
-      font-weight: 900;
-    }
-
-    .history-info strong {
-      display: block;
-      font-size: 12px;
-    }
-
-    .history-info span {
-      display: block;
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 10px;
-    }
-
-    .result-buttons {
-      display: flex;
-      gap: 5px;
-    }
-
-    .result-btn {
-      height: 30px;
-      padding: 0 9px;
-      border-radius: 7px;
-      border: 1px solid var(--border);
-      background: #111a25;
-      color: #c4cfdd;
-      font-size: 9px;
-      font-weight: 800;
-    }
-
-    .result-btn.win:hover {
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .result-btn.loss:hover {
-      border-color: var(--red);
-      color: var(--red);
-    }
-
-    /* ==================================================
-       FOOTER
-       ================================================== */
-
-    .footer {
-      text-align: center;
-      padding: 10px 0 30px;
-      color: #4e5d70;
-      font-size: 10px;
-      letter-spacing: 1px;
-    }
-
-    /* ==================================================
-       TOAST
-       ================================================== */
-
-    #toast {
-      position: fixed;
-      z-index: 100;
-      right: 18px;
-      bottom: 18px;
-      max-width: 350px;
-      padding: 12px 15px;
-      border-radius: 11px;
-      border: 1px solid var(--border);
-      background: #111a25;
-      color: white;
-      font-size: 12px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-      transform: translateY(20px);
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.25s ease;
-    }
-
-    #toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    /* ==================================================
-       RESPONSIVE
-       ================================================== */
-
-    @media (max-width: 900px) {
-      .controls-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .action-buttons {
-        align-items: stretch;
-      }
-
-      .action-buttons .btn {
-        flex: 1;
-      }
-
-      .digits-grid {
+    @media (max-width: 850px) {
+      .momentum-grid {
         grid-template-columns: repeat(5, 1fr);
       }
     }
 
-    @media (max-width: 620px) {
-      .topbar-inner {
-        align-items: flex-start;
-      }
-
-      .connection {
-        font-size: 9px;
-      }
-
-      .container {
-        padding: 14px 11px 35px;
-      }
-
-      .panel {
-        padding: 13px;
-        border-radius: 14px;
-      }
-
-      .controls-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .action-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .status-row {
-        grid-template-columns: 1fr;
-      }
-
-      .data-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .digits-grid {
+    @media (max-width: 520px) {
+      .momentum-grid {
         grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
       }
 
-      #predictedDigit {
-        font-size: 58px;
+      .digit-circle {
+        width: 58px;
+        height: 58px;
+        font-size: 13px;
       }
 
-      .history-item {
-        grid-template-columns: 48px 1fr;
+      .prediction {
+        font-size: 55px;
       }
 
-      .result-buttons {
-        grid-column: 1 / -1;
+      .button-row {
+        grid-template-columns: 1fr;
       }
 
-      .activation-row {
-        flex-direction: column;
-      }
-
-      .activation-row button {
-        width: 100%;
+      .history-row {
+        grid-template-columns: 1fr 1fr;
       }
     }
   </style>
@@ -858,2511 +488,3067 @@
 
 <body>
 
-  <!-- ==================================================
-       LOGIN SCREEN
-       ================================================== -->
+<div class="app">
 
-  <section id="loginScreen">
-    <div class="login-card">
+  <header class="header">
+    <div class="brand">DERIV LIVE ENTRY</div>
+    <div class="powered">POWERED BY ELISY 254</div>
+  </header>
 
-      <div class="brand">
-        <div class="brand-icon">DL</div>
-        <h1>DERIV LIVE ENTRY</h1>
-        <p>POWERED BY ELISY 254</p>
+  <!-- LOGIN -->
+
+  <section id="loginSection" class="card login-card">
+
+    <div class="section-title">
+      LOGIN
+    </div>
+
+    <div class="field">
+      <label>Market</label>
+
+      <input
+        id="loginMarket"
+        placeholder="Enter Market"
+        autocomplete="username"
+      />
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+
+      <input
+        id="loginPassword"
+        type="password"
+        placeholder="Enter Password"
+        autocomplete="current-password"
+      />
+    </div>
+
+    <button
+      id="loginButton"
+      style="width:100%"
+    >
+      OPEN ANALYZER
+    </button>
+
+    <div
+      id="loginMessage"
+      class="message"
+    ></div>
+
+  </section>
+
+
+  <!-- MAIN APP -->
+
+  <main id="mainApp" class="hidden">
+
+    <!-- MARKET -->
+
+    <section class="card">
+
+      <div class="section-title">
+        SELECT MARKET
       </div>
 
       <div class="field">
-        <label for="loginMarket">Market</label>
-        <input
-          id="loginMarket"
-          type="text"
-          placeholder="Enter market"
-          autocomplete="username"
-        />
+        <select id="marketSelect">
+          <option value="">
+            Connecting to Deriv markets...
+          </option>
+        </select>
       </div>
 
-      <div class="field">
-        <label for="loginPassword">Password</label>
-        <input
-          id="loginPassword"
-          type="password"
-          placeholder="Enter password"
-          autocomplete="current-password"
-        />
+      <div class="market-banner">
+
+        <div>
+          <div
+            id="liveMarket"
+            class="live-market"
+          >
+            No market selected
+          </div>
+        </div>
+
+        <div
+          id="connectionStatus"
+          class="connection wait"
+        >
+          WAITING
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CONTRACT -->
+
+    <section class="card">
+
+      <div class="section-title">
+        SELECT CONTRACT
+      </div>
+
+      <select id="contractSelect">
+
+        <option value="ODD">
+          ODD
+        </option>
+
+        <option value="EVEN">
+          EVEN
+        </option>
+
+        <option value="OVER">
+          OVER
+        </option>
+
+        <option value="UNDER">
+          UNDER
+        </option>
+
+        <option value="DIFFERS">
+          DIFFERS
+        </option>
+
+        <option
+          value="MATCHES"
+          id="matchesOption"
+          class="locked"
+        >
+          MATCHES 🔒
+        </option>
+
+      </select>
+
+
+      <div
+        id="barrierBox"
+        class="field hidden"
+        style="margin-top:12px"
+      >
+
+        <label>
+          Barrier Digit
+        </label>
+
+        <select id="barrierSelect">
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5" selected>5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+        </select>
+
+      </div>
+
+
+      <div
+        id="matchesUnlockBox"
+        class="hidden"
+        style="margin-top:15px"
+      >
+
+        <div class="muted">
+          MATCHES is a paid feature.
+          Contact ELISY 254 to activate it for
+          $40.
+        </div>
+
+        <div class="unlock-row">
+
+          <input
+            id="matchesCode"
+            placeholder="Activation code"
+            inputmode="numeric"
+          />
+
+          <button id="unlockMatches">
+            UNLOCK
+          </button>
+
+        </div>
+
+        <div
+          id="unlockMessage"
+          class="message"
+        ></div>
+
+      </div>
+
+
+      <div class="button-row">
+
+        <button
+          id="startButton"
+          class="start"
+        >
+          START
+        </button>
+
+        <button
+          id="stopButton"
+          class="stop"
+          disabled
+        >
+          STOP
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- MOMENTUM -->
+
+    <section class="card">
+
+      <div class="section-title">
+        LIVE DIGIT MOMENTUM
+      </div>
+
+      <div
+        id="momentumMarket"
+        class="muted"
+        style="margin-bottom:15px;font-size:12px;"
+      >
+        Waiting for market...
+      </div>
+
+      <div
+        id="momentumGrid"
+        class="momentum-grid"
+      ></div>
+
+    </section>
+
+
+    <!-- ENTRY -->
+
+    <section
+      id="entryCard"
+      class="card entry-box"
+    >
+
+      <div class="entry-status">
+        ENTRY SIGNAL
+      </div>
+
+      <div
+        id="entryContract"
+        class="entry-contract"
+      >
+        WAITING FOR CONFIRMED ENTRY
+      </div>
+
+      <div
+        id="prediction"
+        class="prediction"
+      >
+        —
+      </div>
+
+      <div
+        id="reason"
+        class="reason"
+      >
+        The analyzer will show suitable digit(s)
+        after enough live Deriv ticks are collected.
+      </div>
+
+      <div
+        id="manualHelp"
+        class="manual-help"
+      >
+        No manual entry yet.
       </div>
 
       <button
-        id="loginBtn"
-        class="primary-btn"
-        type="button"
+        id="manualTradeButton"
+        class="manual"
+        disabled
       >
-        LOGIN
+        MANUAL TRADE
       </button>
 
       <div
-        id="loginError"
-        class="login-error hidden"
-      ></div>
+        id="timer"
+        class="timer"
+      >
 
-    </div>
-  </section>
-
-
-  <!-- ==================================================
-       MAIN APPLICATION
-       ================================================== -->
-
-  <section
-    id="appScreen"
-    class="hidden"
-  >
-
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <div class="topbar-inner">
-
-        <div class="top-brand">
-          <div class="mini-logo">DL</div>
-
-          <div>
-            <strong>DERIV LIVE ENTRY</strong>
-            <span>POWERED BY ELISY 254</span>
-          </div>
+        <div class="timer-label">
+          ENTRY TIME
         </div>
 
-        <div class="connection">
-          <span
-            id="connectionDot"
-            class="connection-dot"
-          ></span>
-
-          <span id="connectionText">
-            OFFLINE
-          </span>
-        </div>
-
-      </div>
-    </header>
-
-
-    <main class="container">
-
-      <!-- ==================================================
-           MARKET CONTROL
-           ================================================== -->
-
-      <section class="panel">
-
-        <div class="panel-title">
-          <h2>LIVE MARKET CONTROL</h2>
-          <span>Analysis only • Manual entry</span>
-        </div>
-
-        <div class="controls-grid">
-
-          <div class="control-group">
-            <label for="marketSelect">
-              Market
-            </label>
-
-            <select id="marketSelect">
-              <option value="">
-                Loading markets...
-              </option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <label for="contractSelect">
-              Contract
-            </label>
-
-            <select id="contractSelect">
-
-              <option value="ODD">
-                ODD
-              </option>
-
-              <option value="EVEN">
-                EVEN
-              </option>
-
-              <option value="OVER">
-                OVER
-              </option>
-
-              <option value="UNDER">
-                UNDER
-              </option>
-
-              <option value="DIFFERS">
-                DIFFERS
-              </option>
-
-              <option value="MATCHES">
-                MATCHES 🔒
-              </option>
-
-            </select>
-          </div>
-
-          <div
-            id="barrierGroup"
-            class="control-group hidden"
-          >
-            <label for="barrierSelect">
-              Barrier
-            </label>
-
-            <select id="barrierSelect">
-
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-
-            </select>
-          </div>
-
-          <div class="action-buttons">
-
-            <button
-              id="startBtn"
-              class="btn btn-start"
-              type="button"
-            >
-              START
-            </button>
-
-            <button
-              id="stopBtn"
-              class="btn btn-stop"
-              type="button"
-              disabled
-            >
-              STOP
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <div class="status-row">
-
-          <div class="status-box">
-            <small>Market</small>
-            <strong id="selectedMarketText">
-              —
-            </strong>
-          </div>
-
-          <div class="status-box">
-            <small>Stream</small>
-            <strong id="streamStatus">
-              READY
-            </strong>
-          </div>
-
-          <div class="status-box">
-            <small>Ticks</small>
-            <strong id="tickCount">
-              0
-            </strong>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           SIGNAL
-           ================================================== -->
-
-      <section class="panel signal-card">
-
-        <div class="signal-label">
-          PREDICTED DIGIT
-        </div>
-
-        <div id="predictedDigit">
+        <div
+          id="timerValue"
+          class="timer-value"
+        >
           —
         </div>
 
-        <div id="signalText">
-          Waiting for live analysis
-        </div>
-
-        <div class="timer-wrap">
-
-          <div class="timer-bar">
-            <div id="timerProgress"></div>
-          </div>
-
-          <span id="timerText">
-            Signal inactive
-          </span>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           DIGIT FREQUENCY
-           ================================================== -->
-
-      <section class="panel">
-
-        <div class="panel-title">
-          <h2>DIGIT FREQUENCY</h2>
-          <span id="frequencyInfo">
-            0 ticks
-          </span>
-        </div>
-
-        <div
-          id="digitsGrid"
-          class="digits-grid"
-        >
-
-          <div class="digit-card" data-digit="0">
-            <div class="digit-number">0</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="1">
-            <div class="digit-number">1</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="2">
-            <div class="digit-number">2</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="3">
-            <div class="digit-number">3</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="4">
-            <div class="digit-number">4</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="5">
-            <div class="digit-number">5</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="6">
-            <div class="digit-number">6</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="7">
-            <div class="digit-number">7</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="8">
-            <div class="digit-number">8</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-          <div class="digit-card" data-digit="9">
-            <div class="digit-number">9</div>
-            <div class="digit-count">0</div>
-            <div class="digit-bar">
-              <span></span>
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           LIVE DATA
-           ================================================== -->
-
-      <section class="panel">
-
-        <div class="panel-title">
-          <h2>LIVE DATA</h2>
-          <span>Real-time market information</span>
-        </div>
-
-        <div class="data-grid">
-
-          <div class="data-card">
-            <small>Last Quote</small>
-            <strong id="lastQuote">
-              —
-            </strong>
-          </div>
-
-          <div class="data-card">
-            <small>Ticks Received</small>
-            <strong id="liveTickCount">
-              0
-            </strong>
-          </div>
-
-          <div class="data-card">
-            <small>Analysis Score</small>
-            <strong id="analysisScore">
-              —
-            </strong>
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           MATCHES ACTIVATION
-           ================================================== -->
-
-      <section class="panel matches-panel">
-
-        <div class="matches-header">
-
-          <div class="panel-title" style="margin:0;">
-            <div>
-              <h2>MATCHES</h2>
-              <span>
-                Additional activation required
-              </span>
-            </div>
-          </div>
-
-          <div class="lock-badge">
-            🔒 LOCKED
-          </div>
-
-        </div>
-
-        <div class="activation-box">
-
-          <div style="font-size:12px;font-weight:800;">
-            MATCHES ACTIVATION
-          </div>
-
-          <div
-            style="
-              margin-top:5px;
-              color:var(--muted);
-              font-size:10px;
-            "
-          >
-            Enter your activation code to enable
-            MATCHES analysis.
-          </div>
-
-          <div class="activation-row">
-
-            <input
-              id="matchesCode"
-              type="password"
-              placeholder="Activation code"
-            />
-
-            <button
-              id="activateMatchesBtn"
-              type="button"
-            >
-              ACTIVATE
-            </button>
-
-          </div>
-
-          <a
-            class="whatsapp"
-            href="https://wa.me/254701859605"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            CONTACT ELISY 254 — $40
-          </a>
-
-          <div
-            id="matchesStatus"
-            class="matches-status"
-          >
-            MATCHES is locked.
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           MANUAL TRADE / ANALYSIS HISTORY
-           ================================================== -->
-
-      <section class="panel">
-
-        <div class="panel-title">
-          <h2>MANUAL ENTRY HISTORY</h2>
-
-          <span>
-            No automatic trades
-          </span>
-        </div>
-
-        <div
-          id="historyList"
-          class="history-list"
-        >
-
-          <div class="history-empty">
-            No analysis signals recorded yet.
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <div class="footer">
-        DERIV LIVE ENTRY • POWERED BY ELISY 254
-        <br />
-        ANALYSIS ONLY — MANUAL ENTRY REQUIRED
       </div>
 
-    </main>
-
-  </section>
+    </section>
 
 
-  <div id="toast"></div>
+    <!-- DON'T TRADE -->
+
+    <section
+      id="dontTrade"
+      class="dont-trade"
+    >
+
+      <div class="dont-title">
+        🚫 DON'T TRADE
+      </div>
+
+      <div
+        id="dontMessage"
+        class="dont-message"
+      >
+        Wait for a new confirmed signal.
+      </div>
+
+    </section>
 
 
-  <!-- ==================================================
-       JAVASCRIPT
-       ================================================== -->
+    <!-- ANALYSIS -->
 
-  <script>
-    "use strict";
+    <section class="card">
 
-    /*
-    ======================================================
-    GLOBAL STATE
-    ======================================================
-    */
+      <div class="section-title">
+        LIVE ANALYSIS
+      </div>
 
-    let socket = null;
+      <div class="stats">
 
-    let authenticated = false;
+        <div class="stat">
 
-    let selectedSymbol = "";
-    let selectedMarketName = "";
+          <div
+            id="tickCount"
+            class="stat-number"
+          >
+            0
+          </div>
 
-    let selectedPrecision = 2;
+          <div class="stat-label">
+            LIVE TICKS
+          </div>
 
-    let ticks = [];
-
-    let counts = Array(10).fill(0);
-
-    let totalTicks = 0;
-
-    let matchesUnlocked = false;
-
-    let signalDigit = null;
-
-    let signalStartedAt = 0;
-
-    const SIGNAL_DURATION = 60 * 1000;
-
-    let signalTimer = null;
-
-    let historyData = [];
-
-    /*
-    ======================================================
-    DOM
-    ======================================================
-    */
-
-    const loginScreen =
-      document.getElementById("loginScreen");
-
-    const appScreen =
-      document.getElementById("appScreen");
-
-    const loginMarket =
-      document.getElementById("loginMarket");
-
-    const loginPassword =
-      document.getElementById("loginPassword");
-
-    const loginBtn =
-      document.getElementById("loginBtn");
-
-    const loginError =
-      document.getElementById("loginError");
-
-    const marketSelect =
-      document.getElementById("marketSelect");
-
-    const contractSelect =
-      document.getElementById("contractSelect");
-
-    const barrierGroup =
-      document.getElementById("barrierGroup");
-
-    const barrierSelect =
-      document.getElementById("barrierSelect");
-
-    const startBtn =
-      document.getElementById("startBtn");
-
-    const stopBtn =
-      document.getElementById("stopBtn");
-
-    const connectionDot =
-      document.getElementById("connectionDot");
-
-    const connectionText =
-      document.getElementById("connectionText");
-
-    const selectedMarketText =
-      document.getElementById(
-        "selectedMarketText"
-      );
-
-    const streamStatus =
-      document.getElementById(
-        "streamStatus"
-      );
-
-    const tickCount =
-      document.getElementById(
-        "tickCount"
-      );
-
-    const predictedDigit =
-      document.getElementById(
-        "predictedDigit"
-      );
-
-    const signalText =
-      document.getElementById(
-        "signalText"
-      );
-
-    const timerProgress =
-      document.getElementById(
-        "timerProgress"
-      );
-
-    const timerText =
-      document.getElementById(
-        "timerText"
-      );
-
-    const frequencyInfo =
-      document.getElementById(
-        "frequencyInfo"
-      );
-
-    const lastQuote =
-      document.getElementById(
-        "lastQuote"
-      );
-
-    const liveTickCount =
-      document.getElementById(
-        "liveTickCount"
-      );
-
-    const analysisScore =
-      document.getElementById(
-        "analysisScore"
-      );
-
-    const matchesCode =
-      document.getElementById(
-        "matchesCode"
-      );
-
-    const activateMatchesBtn =
-      document.getElementById(
-        "activateMatchesBtn"
-      );
-
-    const matchesStatus =
-      document.getElementById(
-        "matchesStatus"
-      );
-
-    const historyList =
-      document.getElementById(
-        "historyList"
-      );
-
-    const toast =
-      document.getElementById("toast");
+        </div>
 
 
-    /*
-    ======================================================
-    TOAST
-    ======================================================
-    */
+        <div class="stat">
 
-    let toastTimeout = null;
+          <div
+            id="lastDigit"
+            class="stat-number"
+          >
+            —
+          </div>
 
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add("show");
+          <div class="stat-label">
+            LAST DIGIT
+          </div>
 
-      clearTimeout(toastTimeout);
+        </div>
 
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3000);
+
+        <div class="stat">
+
+          <div
+            id="analysisScore"
+            class="stat-number"
+          >
+            —
+          </div>
+
+          <div class="stat-label">
+            ANALYSIS SCORE
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- HISTORY -->
+
+    <section class="card">
+
+      <div class="section-title">
+        DIGIT HISTORY
+      </div>
+
+      <div
+        id="digitHistory"
+        class="muted"
+      >
+        No ticks yet.
+      </div>
+
+    </section>
+
+
+    <!-- TRADE HISTORY -->
+
+    <section class="card">
+
+      <div class="section-title">
+        MANUAL TRADE HISTORY
+      </div>
+
+      <div id="tradeHistory">
+        No manual trades recorded.
+      </div>
+
+    </section>
+
+
+    <!-- WHATSAPP -->
+
+    <section class="card">
+
+      <a
+        class="whatsapp"
+        href="https://wa.me/254701859605"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        CONTACT ELISY 254 ON WHATSAPP
+      </a>
+
+    </section>
+
+  </main>
+</div>
+
+
+<script>
+/* =========================================================
+   STATE
+========================================================= */
+
+let socket = null;
+
+let loggedIn = false;
+let running = false;
+
+let currentMarket = "";
+let currentSymbol = "";
+let currentContract = "ODD";
+let currentPrecision = null;
+
+let matchesUnlocked = false;
+
+let ticks = [];
+let digits = [];
+
+let currentSignal = null;
+let signalSequence = 0;
+
+let entryTimer = null;
+let entrySeconds = 0;
+
+let reconnectTimer = null;
+let reconnectAttempts = 0;
+
+let pendingStart = false;
+let intentionalSocketClose = false;
+
+const MAX_DIGITS = 60;
+const MIN_TICKS_FOR_ANALYSIS = 20;
+const SIGNAL_SCORE_THRESHOLD = 72;
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const loginSection =
+  document.getElementById("loginSection");
+
+const mainApp =
+  document.getElementById("mainApp");
+
+const loginMarket =
+  document.getElementById("loginMarket");
+
+const loginPassword =
+  document.getElementById("loginPassword");
+
+const loginButton =
+  document.getElementById("loginButton");
+
+const loginMessage =
+  document.getElementById("loginMessage");
+
+const marketSelect =
+  document.getElementById("marketSelect");
+
+const contractSelect =
+  document.getElementById("contractSelect");
+
+const barrierBox =
+  document.getElementById("barrierBox");
+
+const barrierSelect =
+  document.getElementById("barrierSelect");
+
+const startButton =
+  document.getElementById("startButton");
+
+const stopButton =
+  document.getElementById("stopButton");
+
+const connectionStatus =
+  document.getElementById("connectionStatus");
+
+const liveMarket =
+  document.getElementById("liveMarket");
+
+const momentumMarket =
+  document.getElementById("momentumMarket");
+
+const momentumGrid =
+  document.getElementById("momentumGrid");
+
+const entryContract =
+  document.getElementById("entryContract");
+
+const prediction =
+  document.getElementById("prediction");
+
+const reason =
+  document.getElementById("reason");
+
+const manualHelp =
+  document.getElementById("manualHelp");
+
+const manualTradeButton =
+  document.getElementById("manualTradeButton");
+
+const timer =
+  document.getElementById("timer");
+
+const timerValue =
+  document.getElementById("timerValue");
+
+const dontTrade =
+  document.getElementById("dontTrade");
+
+const dontMessage =
+  document.getElementById("dontMessage");
+
+const tickCount =
+  document.getElementById("tickCount");
+
+const lastDigit =
+  document.getElementById("lastDigit");
+
+const analysisScore =
+  document.getElementById("analysisScore");
+
+const digitHistory =
+  document.getElementById("digitHistory");
+
+const tradeHistory =
+  document.getElementById("tradeHistory");
+
+const matchesOption =
+  document.getElementById("matchesOption");
+
+const matchesUnlockBox =
+  document.getElementById("matchesUnlockBox");
+
+const unlockMatches =
+  document.getElementById("unlockMatches");
+
+const matchesCode =
+  document.getElementById("matchesCode");
+
+const unlockMessage =
+  document.getElementById("unlockMessage");
+
+
+/* =========================================================
+   MOMENTUM CIRCLES
+========================================================= */
+
+function buildMomentumCircles() {
+
+  momentumGrid.innerHTML = "";
+
+  for (let digit = 0; digit <= 9; digit++) {
+
+    const wrapper =
+      document.createElement("div");
+
+    wrapper.className = "digit-card";
+
+    const circle =
+      document.createElement("div");
+
+    circle.className =
+      "digit-circle blue";
+
+    circle.id =
+      `digitCircle${digit}`;
+
+    const span =
+      document.createElement("span");
+
+    span.textContent = digit;
+
+    circle.appendChild(span);
+
+    const label =
+      document.createElement("div");
+
+    label.className =
+      "digit-label";
+
+    label.id =
+      `digitPercent${digit}`;
+
+    label.textContent = "0.0%";
+
+    wrapper.appendChild(circle);
+    wrapper.appendChild(label);
+
+    momentumGrid.appendChild(wrapper);
+  }
+}
+
+buildMomentumCircles();
+
+
+/* =========================================================
+   CONNECTION UI
+========================================================= */
+
+function setConnectionStatus(text, type = "wait") {
+
+  connectionStatus.textContent = text;
+
+  connectionStatus.className =
+    `connection ${type}`;
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+loginButton.addEventListener("click", login);
+
+loginPassword.addEventListener("keydown", (event) => {
+
+  if (event.key === "Enter") {
+    login();
+  }
+
+});
+
+loginMarket.addEventListener("keydown", (event) => {
+
+  if (event.key === "Enter") {
+    login();
+  }
+
+});
+
+
+async function login() {
+
+  loginMessage.textContent = "";
+
+  const market =
+    loginMarket.value.trim();
+
+  const password =
+    loginPassword.value;
+
+  if (!market || !password) {
+
+    loginMessage.textContent =
+      "Enter your market and password.";
+
+    return;
+  }
+
+  loginButton.disabled = true;
+  loginButton.textContent = "CONNECTING...";
+
+  try {
+
+    const response =
+      await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          market,
+          password
+        })
+      });
+
+    const data =
+      await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+
+      loginMessage.textContent =
+        data.message ||
+        "Login failed.";
+
+      return;
     }
 
+    loggedIn = true;
 
-    /*
-    ======================================================
-    LOGIN
-    ======================================================
-    */
+    loginSection.classList.add("hidden");
+    mainApp.classList.remove("hidden");
 
-    loginBtn.addEventListener(
-      "click",
-      login
+    connectBrowserSocket();
+
+  } catch (error) {
+
+    console.error("Login error:", error);
+
+    loginMessage.textContent =
+      "Could not connect to server.";
+
+  } finally {
+
+    loginButton.disabled = false;
+    loginButton.textContent =
+      "OPEN ANALYZER";
+  }
+}
+
+
+/* =========================================================
+   BROWSER WEBSOCKET
+========================================================= */
+
+function connectBrowserSocket() {
+
+  if (!loggedIn) {
+    return;
+  }
+
+  if (
+    socket &&
+    (
+      socket.readyState === WebSocket.OPEN ||
+      socket.readyState === WebSocket.CONNECTING
+    )
+  ) {
+    return;
+  }
+
+  intentionalSocketClose = false;
+
+  clearTimeout(reconnectTimer);
+
+  setConnectionStatus(
+    "CONNECTING",
+    "wait"
+  );
+
+  let protocol =
+    location.protocol === "https:"
+      ? "wss"
+      : "ws";
+
+  socket =
+    new WebSocket(
+      `${protocol}://${location.host}`
     );
 
-    loginPassword.addEventListener(
-      "keydown",
-      (event) => {
-        if (event.key === "Enter") {
-          login();
-        }
-      }
+  socket.addEventListener("open", () => {
+
+    reconnectAttempts = 0;
+
+    setConnectionStatus(
+      "SERVER CONNECTED",
+      "live"
     );
 
-    loginMarket.addEventListener(
-      "keydown",
-      (event) => {
-        if (event.key === "Enter") {
-          login();
-        }
-      }
-    );
-
-    async function login() {
-      loginError.classList.add("hidden");
-
-      const market =
-        loginMarket.value.trim();
-
-      const password =
-        loginPassword.value;
-
-      if (!market || !password) {
-        showLoginError(
-          "Enter market and password."
-        );
-        return;
-      }
-
-      loginBtn.disabled = true;
-      loginBtn.textContent =
-        "LOGGING IN...";
-
-      try {
-        const response =
-          await fetch(
-            "/api/login",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-              body: JSON.stringify({
-                market,
-                password
-              })
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (!response.ok || !data.ok) {
-          throw new Error(
-            data.message ||
-              "Login failed."
-          );
-        }
-
-        authenticated = true;
-
-        loginScreen.classList.add(
-          "hidden"
-        );
-
-        appScreen.classList.remove(
-          "hidden"
-        );
-
-        connectSocket();
-
-      } catch (error) {
-        showLoginError(
-          error.message ||
-            "Login failed."
-        );
-      } finally {
-        loginBtn.disabled = false;
-        loginBtn.textContent = "LOGIN";
-      }
-    }
-
-    function showLoginError(message) {
-      loginError.textContent = message;
-      loginError.classList.remove(
-        "hidden"
-      );
-    }
-
-
-    /*
-    ======================================================
-    SESSION CHECK
-    ======================================================
-    */
-
-    async function checkSession() {
-      try {
-        const response =
-          await fetch(
-            "/api/session",
-            {
-              credentials: "same-origin"
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (data.authenticated) {
-          authenticated = true;
-
-          matchesUnlocked =
-            Boolean(
-              data.matchesUnlocked
-            );
-
-          loginScreen.classList.add(
-            "hidden"
-          );
-
-          appScreen.classList.remove(
-            "hidden"
-          );
-
-          updateMatchesUI();
-
-          connectSocket();
-        }
-      } catch (error) {
-        console.error(
-          "Session check failed:",
-          error
-        );
-      }
-    }
-
-
-    /*
-    ======================================================
-    SOCKET CONNECTION
-    ======================================================
-    */
-
-    function connectSocket() {
-      if (!authenticated) {
-        return;
-      }
-
-      if (
-        socket &&
-        (
-          socket.readyState ===
-            WebSocket.OPEN ||
-          socket.readyState ===
-            WebSocket.CONNECTING
-        )
-      ) {
-        return;
-      }
-
-      setConnection(
-        false,
-        "CONNECTING"
-      );
-
-      const protocol =
-        location.protocol === "https:"
-          ? "wss:"
-          : "ws:";
-
-      socket = new WebSocket(
-        `${protocol}//${location.host}/live`
-      );
-
-      socket.onopen = () => {
-        setConnection(
-          true,
-          "ONLINE"
-        );
-
-        streamStatus.textContent =
-          "READY";
-
-        loadMarkets();
-      };
-
-      socket.onmessage = (event) => {
-        handleServerMessage(
-          event.data
-        );
-      };
-
-      socket.onerror = () => {
-        setConnection(
-          false,
-          "ERROR"
-        );
-      };
-
-      socket.onclose = () => {
-        setConnection(
-          false,
-          "OFFLINE"
-        );
-
-        streamStatus.textContent =
-          "OFFLINE";
-
-        socket = null;
-
-        /*
-        Reconnect automatically while logged in.
-        */
-        if (authenticated) {
-          setTimeout(() => {
-            if (
-              authenticated &&
-              !socket
-            ) {
-              connectSocket();
-            }
-          }, 3000);
-        }
-      };
-    }
-
-
-    function setConnection(
-      online,
-      text
-    ) {
-      connectionText.textContent =
-        text;
-
-      connectionDot.classList.toggle(
-        "online",
-        online
-      );
-    }
-
-
-    /*
-    ======================================================
-    LOAD MARKETS
-    ======================================================
-    */
-
-    async function loadMarkets() {
-      marketSelect.innerHTML =
-        "<option value=''>Loading markets...</option>";
-
-      try {
-        const response =
-          await fetch(
-            "/api/markets",
-            {
-              credentials:
-                "same-origin"
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (!response.ok || !data.ok) {
-          throw new Error(
-            data.message ||
-              "Unable to load markets."
-          );
-        }
-
-        if (
-          !Array.isArray(
-            data.markets
-          ) ||
-          data.markets.length === 0
-        ) {
-          throw new Error(
-            "No active Volatility or Jump markets found."
-          );
-        }
-
-        populateMarkets(
-          data.markets
-        );
-
-        if (data.stale) {
-          showToast(
-            "Using cached market list."
-          );
-        }
-
-      } catch (error) {
-        marketSelect.innerHTML =
-          "<option value=''>Markets unavailable</option>";
-
-        showToast(
-          error.message ||
-            "Market loading failed."
-        );
-      }
-    }
-
-
-    function populateMarkets(
-      markets
-    ) {
-      marketSelect.innerHTML = "";
-
-      for (const market of markets) {
-        const option =
-          document.createElement(
-            "option"
-          );
-
-        option.value =
-          market.symbol;
-
-        option.textContent =
-          market.name;
-
-        option.dataset.symbol =
-          market.symbol;
-
-        option.dataset.name =
-          market.name;
-
-        option.dataset.precision =
-          String(
-            market.precision ?? 2
-          );
-
-        option.dataset.pipSize =
-          String(
-            market.pipSize ?? ""
-          );
-
-        marketSelect.appendChild(
-          option
-        );
-      }
-
-      updateSelectedMarket();
-    }
-
-
-    /*
-    ======================================================
-    MARKET SELECTION
-    ======================================================
-    */
-
-    marketSelect.addEventListener(
-      "change",
-      updateSelectedMarket
-    );
-
-    function updateSelectedMarket() {
-      const option =
-        marketSelect.options[
-          marketSelect.selectedIndex
-        ];
-
-      if (!option || !option.value) {
-        selectedSymbol = "";
-        selectedMarketName = "";
-
-        selectedMarketText.textContent =
-          "—";
-
-        return;
-      }
-
-      selectedSymbol =
-        option.dataset.symbol ||
-        option.value;
-
-      selectedMarketName =
-        option.dataset.name ||
-        option.textContent;
-
-      selectedPrecision =
-        Number(
-          option.dataset.precision
-        );
-
-      if (
-        !Number.isFinite(
-          selectedPrecision
-        )
-      ) {
-        selectedPrecision = 2;
-      }
-
-      selectedMarketText.textContent =
-        selectedMarketName;
-    }
-
-
-    /*
-    ======================================================
-    CONTRACT
-    ======================================================
-    */
-
-    contractSelect.addEventListener(
-      "change",
-      updateBarrierVisibility
-    );
-
-    function updateBarrierVisibility() {
-      const contract =
-        contractSelect.value;
-
-      barrierGroup.classList.toggle(
-        "hidden",
-        contract !== "OVER" &&
-          contract !== "UNDER"
-      );
-
-      if (
-        contract === "MATCHES" &&
-        !matchesUnlocked
-      ) {
-        showToast(
-          "MATCHES is locked. Activate it first."
-        );
-
-        contractSelect.value =
-          "ODD";
-      }
-    }
-
-
-    /*
-    ======================================================
-    START
-    ======================================================
-    */
-
-    startBtn.addEventListener(
-      "click",
-      startAnalysis
-    );
-
-    async function startAnalysis() {
-      if (
-        !socket ||
-        socket.readyState !==
-          WebSocket.OPEN
-      ) {
-        showToast(
-          "Live connection is not ready."
-        );
-
-        connectSocket();
-        return;
-      }
-
-      const option =
-        marketSelect.options[
-          marketSelect.selectedIndex
-        ];
-
-      if (!option || !option.value) {
-        showToast(
-          "Select a market first."
-        );
-        return;
-      }
-
-      updateSelectedMarket();
-
-      const contract =
-        contractSelect.value;
-
-      if (
-        contract === "MATCHES" &&
-        !matchesUnlocked
-      ) {
-        showToast(
-          "MATCHES activation is required."
-        );
-
-        return;
-      }
-
-      resetAnalysis();
-
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-
-      streamStatus.textContent =
-        "CONNECTING";
+    try {
 
       socket.send(
         JSON.stringify({
-          action: "start",
-          marketName:
-            selectedMarketName,
-          symbol:
-            selectedSymbol
+          action: "markets"
         })
+      );
+
+      /*
+       * If START was pressed while the socket was
+       * still connecting, start now.
+       */
+      if (pendingStart) {
+
+        pendingStart = false;
+
+        setTimeout(() => {
+
+          if (
+            socket &&
+            socket.readyState === WebSocket.OPEN
+          ) {
+            startMarket();
+          }
+
+        }, 0);
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Socket open/send error:",
+        error
       );
     }
 
+  });
 
-    /*
-    ======================================================
-    STOP
-    ======================================================
-    */
 
-    stopBtn.addEventListener(
-      "click",
-      stopAnalysis
+  socket.addEventListener("message", (event) => {
+
+    let data;
+
+    try {
+      data = JSON.parse(event.data);
+    } catch (error) {
+      console.warn(
+        "Invalid WebSocket message:",
+        event.data
+      );
+      return;
+    }
+
+    handleServerMessage(data);
+
+  });
+
+
+  socket.addEventListener("close", () => {
+
+    setConnectionStatus(
+      "DISCONNECTED",
+      "wait"
     );
 
-    function stopAnalysis() {
-      if (
-        socket &&
-        socket.readyState ===
-          WebSocket.OPEN
-      ) {
+    currentSymbol = "";
+
+    if (running) {
+
+      showDontTrade(
+        "Connection lost. Don't trade until the live market connection returns."
+      );
+
+      stopCurrentSignal();
+      clearTimer();
+
+    }
+
+    if (
+      loggedIn &&
+      !intentionalSocketClose
+    ) {
+
+      scheduleReconnect();
+    }
+
+  });
+
+
+  socket.addEventListener("error", (error) => {
+
+    console.error(
+      "Browser WebSocket error:",
+      error
+    );
+
+    setConnectionStatus(
+      "CONNECTION ERROR",
+      "wait"
+    );
+
+  });
+}
+
+
+/* =========================================================
+   AUTOMATIC RECONNECT
+========================================================= */
+
+function scheduleReconnect() {
+
+  if (!loggedIn) {
+    return;
+  }
+
+  if (reconnectTimer) {
+    return;
+  }
+
+  reconnectAttempts++;
+
+  const delay =
+    Math.min(
+      1000 * Math.pow(2, reconnectAttempts - 1),
+      10000
+    );
+
+  setConnectionStatus(
+    `RECONNECTING IN ${Math.ceil(delay / 1000)}s`,
+    "wait"
+  );
+
+  reconnectTimer =
+    setTimeout(() => {
+
+      reconnectTimer = null;
+
+      connectBrowserSocket();
+
+    }, delay);
+}
+
+
+/* =========================================================
+   SERVER MESSAGES
+========================================================= */
+
+function handleServerMessage(data) {
+
+  if (!data || typeof data !== "object") {
+    return;
+  }
+
+
+  if (data.type === "hello") {
+
+    return;
+  }
+
+
+  if (data.type === "markets") {
+
+    populateMarkets(
+      Array.isArray(data.markets)
+        ? data.markets
+        : []
+    );
+
+    return;
+  }
+
+
+  if (data.type === "market_connected") {
+
+    currentMarket =
+      data.market || "";
+
+    currentSymbol =
+      data.symbol || "";
+
+    currentPrecision =
+      Number.isInteger(data.precision)
+        ? data.precision
+        : null;
+
+    liveMarket.textContent =
+      currentMarket
+        ? `LIVE • ${currentMarket}`
+        : "LIVE MARKET";
+
+    momentumMarket.textContent =
+      currentMarket
+        ? `All digit momentum from ${currentMarket}`
+        : "Waiting for market...";
+
+    setConnectionStatus(
+      "DERIV LIVE",
+      "live"
+    );
+
+    return;
+  }
+
+
+  if (data.type === "tick") {
+
+    if (!running) {
+      return;
+    }
+
+    if (
+      !currentSymbol ||
+      data.symbol !== currentSymbol
+    ) {
+      return;
+    }
+
+    processTick(data);
+
+    return;
+  }
+
+
+  if (data.type === "market_stopped") {
+
+    running = false;
+
+    currentSymbol = "";
+
+    stopCurrentSignal();
+    clearTimer();
+    resetAnalysis();
+
+    startButton.disabled = false;
+    stopButton.disabled = true;
+
+    marketSelect.disabled = false;
+    contractSelect.disabled = false;
+
+    setConnectionStatus(
+      "STOPPED",
+      "wait"
+    );
+
+    return;
+  }
+
+
+  if (
+    data.type === "market_error" ||
+    data.type === "deriv_error"
+  ) {
+
+    console.error(
+      "Server/Deriv error:",
+      data
+    );
+
+    running = false;
+
+    currentSymbol = "";
+
+    stopCurrentSignal();
+    clearTimer();
+
+    startButton.disabled = false;
+    stopButton.disabled = true;
+
+    marketSelect.disabled = false;
+    contractSelect.disabled = false;
+
+    setConnectionStatus(
+      "MARKET ERROR",
+      "wait"
+    );
+
+    showDontTrade(
+      data.message ||
+      "Deriv market data error. Wait before trading."
+    );
+
+    return;
+  }
+}
+
+
+/* =========================================================
+   MARKET SELECTOR
+========================================================= */
+
+function populateMarkets(markets) {
+
+  const previous =
+    marketSelect.value;
+
+  marketSelect.innerHTML = "";
+
+  if (!markets.length) {
+
+    const option =
+      document.createElement("option");
+
+    option.value = "";
+
+    option.textContent =
+      "No Volatility / Jump markets available";
+
+    marketSelect.appendChild(option);
+
+    return;
+  }
+
+
+  for (const market of markets) {
+
+    if (!market || !market.name) {
+      continue;
+    }
+
+    const option =
+      document.createElement("option");
+
+    option.value =
+      market.name;
+
+    option.textContent =
+      market.name;
+
+    option.dataset.symbol =
+      market.symbol || "";
+
+    option.dataset.pipSize =
+      market.pipSize || "";
+
+    marketSelect.appendChild(option);
+  }
+
+
+  if (
+    previous &&
+    Array.from(
+      marketSelect.options
+    ).some(
+      option =>
+        option.value === previous
+    )
+  ) {
+
+    marketSelect.value =
+      previous;
+
+  } else {
+
+    marketSelect.selectedIndex = 0;
+  }
+}
+
+
+/* =========================================================
+   MARKET CHANGE
+========================================================= */
+
+marketSelect.addEventListener(
+  "change",
+  () => {
+
+    if (!marketSelect.value) {
+      return;
+    }
+
+    stopCurrentSignal();
+    clearTimer();
+
+    if (
+      socket &&
+      socket.readyState === WebSocket.OPEN
+    ) {
+
+      try {
+
         socket.send(
           JSON.stringify({
             action: "stop"
           })
         );
-      }
 
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-
-      streamStatus.textContent =
-        "STOPPED";
-
-      stopSignalTimer();
+      } catch {}
     }
 
+    running = false;
 
-    /*
-    ======================================================
-    RESET ANALYSIS
-    ======================================================
-    */
+    resetAnalysis();
 
-    function resetAnalysis() {
-      ticks = [];
-      counts = Array(10).fill(0);
-      totalTicks = 0;
+    currentMarket =
+      marketSelect.value;
 
-      signalDigit = null;
+    currentSymbol = "";
 
-      stopSignalTimer();
+    liveMarket.textContent =
+      `SELECTED • ${currentMarket}`;
 
-      predictedDigit.textContent =
-        "—";
+    momentumMarket.textContent =
+      `Waiting for fresh ${currentMarket} ticks...`;
 
-      signalText.textContent =
-        "Collecting live ticks...";
-
-      timerText.textContent =
-        "Waiting for analysis";
-
-      timerProgress.style.width =
-        "0%";
-
-      lastQuote.textContent =
-        "—";
-
-      liveTickCount.textContent =
-        "0";
-
-      tickCount.textContent =
-        "0";
-
-      analysisScore.textContent =
-        "—";
-
-      renderDigitCounts();
-    }
-
-
-    /*
-    ======================================================
-    SERVER MESSAGES
-    ======================================================
-    */
-
-    function handleServerMessage(
-      raw
-    ) {
-      let data;
-
-      try {
-        data = JSON.parse(raw);
-      } catch (error) {
-        return;
-      }
-
-      if (!data || typeof data !== "object") {
-        return;
-      }
-
-      switch (data.type) {
-
-        case "deriv_status":
-          handleDerivStatus(data);
-          break;
-
-        case "market_confirmed":
-          handleMarketConfirmed(data);
-          break;
-
-        case "history":
-          handleHistory(data);
-          break;
-
-        case "tick":
-          handleTick(data);
-          break;
-
-        case "deriv_error":
-          handleDerivError(data);
-          break;
-
-        case "market_not_found":
-          handleMarketNotFound(data);
-          break;
-
-        case "closed":
-          handleClosed(data);
-          break;
-
-        default:
-          break;
-      }
-    }
-
-
-    /*
-    ======================================================
-    DERIV STATUS
-    ======================================================
-    */
-
-    function handleDerivStatus(
-      data
-    ) {
-      if (data.status) {
-        streamStatus.textContent =
-          String(
-            data.status
-          ).toUpperCase();
-      }
-
-      if (
-        data.status === "connected"
-      ) {
-        setConnection(
-          true,
-          "ONLINE"
-        );
-      }
-
-      if (
-        data.status === "connecting"
-      ) {
-        setConnection(
-          false,
-          "CONNECTING"
-        );
-      }
-
-      if (
-        data.status === "error"
-      ) {
-        setConnection(
-          false,
-          "ERROR"
-        );
-
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-      }
-    }
-
-
-    /*
-    ======================================================
-    MARKET CONFIRMED
-    ======================================================
-    */
-
-    function handleMarketConfirmed(
-      data
-    ) {
-      /*
-      Server is authoritative.
-      */
-      selectedSymbol =
-        data.symbol ||
-        selectedSymbol;
-
-      selectedMarketName =
-        data.marketName ||
-        selectedMarketName;
-
-      selectedPrecision =
-        Number(
-          data.precision ??
-            selectedPrecision
-        );
-
-      selectedMarketText.textContent =
-        selectedMarketName;
-
-      streamStatus.textContent =
-        "LIVE";
-
-      showToast(
-        `Connected: ${selectedMarketName}`
-      );
-    }
-
-
-    /*
-    ======================================================
-    HISTORY
-    ======================================================
-    */
-
-    function handleHistory(
-      data
-    ) {
-      /*
-      Critical market isolation.
-      */
-      if (
-        data.symbol &&
-        data.symbol !==
-          selectedSymbol
-      ) {
-        return;
-      }
-
-      if (
-        Number.isFinite(
-          Number(data.precision)
-        )
-      ) {
-        selectedPrecision =
-          Number(data.precision);
-      }
-
-      const incoming =
-        Array.isArray(data.ticks)
-          ? data.ticks
-          : [];
-
-      /*
-      Start fresh for this market.
-      */
-      ticks = [];
-
-      counts =
-        Array(10).fill(0);
-
-      totalTicks = 0;
-
-      for (const item of incoming) {
-        addTickToAnalysis(
-          item.quote,
-          false
-        );
-
-        /*
-        Keep a maximum working window.
-        */
-        if (
-          Number.isFinite(
-            Number(item.quote)
-          )
-        ) {
-          ticks.push({
-            quote:
-              Number(item.quote),
-            epoch:
-              Number(item.epoch)
-          });
-        }
-      }
-
-      if (ticks.length > 200) {
-        ticks =
-          ticks.slice(-200);
-      }
-
-      updateAllDisplay();
-
-      /*
-      Do not immediately freeze a signal from
-      old history. The analyzer waits for enough
-      current data.
-      */
-      signalDigit = null;
-
-      predictedDigit.textContent =
-        "—";
-
-      signalText.textContent =
-        ticks.length >= 20
-          ? "Monitoring live ticks..."
-          : "Collecting enough ticks...";
-
-      analysisScore.textContent =
-        "—";
-    }
-
-
-    /*
-    ======================================================
-    LIVE TICK
-    ======================================================
-    */
-
-    function handleTick(
-      data
-    ) {
-      /*
-      NEVER mix markets.
-      */
-      if (
-        data.symbol &&
-        data.symbol !==
-          selectedSymbol
-      ) {
-        return;
-      }
-
-      const quote =
-        Number(
-          data.tick?.quote
-        );
-
-      const epoch =
-        Number(
-          data.tick?.epoch
-        );
-
-      if (
-        !Number.isFinite(quote)
-      ) {
-        return;
-      }
-
-      if (
-        Number.isFinite(
-          Number(data.precision)
-        )
-      ) {
-        selectedPrecision =
-          Number(data.precision);
-      }
-
-      ticks.push({
-        quote,
-        epoch:
-          Number.isFinite(epoch)
-            ? epoch
-            : Math.floor(
-                Date.now() / 1000
-              )
-      });
-
-      if (ticks.length > 200) {
-        ticks =
-          ticks.slice(-200);
-      }
-
-      addTickToAnalysis(
-        quote,
-        true
-      );
-
-      lastQuote.textContent =
-        formatQuote(
-          quote,
-          selectedPrecision
-        );
-
-      liveTickCount.textContent =
-        String(totalTicks);
-
-      tickCount.textContent =
-        String(totalTicks);
-
-      updateFrequencyDisplay();
-
-      runAnalyzer();
-    }
-
-
-    /*
-    ======================================================
-    ADD TICK
-    ======================================================
-    */
-
-    function addTickToAnalysis(
-      quote,
-      countTick
-    ) {
-      const digit =
-        extractLastDigit(
-          quote,
-          selectedPrecision
-        );
-
-      if (
-        digit === null ||
-        digit < 0 ||
-        digit > 9
-      ) {
-        return;
-      }
-
-      counts[digit]++;
-
-      if (countTick) {
-        totalTicks++;
-      } else {
-        totalTicks++;
-      }
-    }
-
-
-    /*
-    ======================================================
-    DIGIT EXTRACTION
-    ======================================================
-    */
-
-    function extractLastDigit(
-      quote,
-      precision
-    ) {
-      if (
-        !Number.isFinite(
-          Number(quote)
-        )
-      ) {
-        return null;
-      }
-
-      const p =
-        Math.max(
-          0,
-          Math.min(
-            10,
-            Number(
-              precision
-            ) || 0
-          )
-        );
-
-      /*
-      Convert according to market precision.
-      */
-      const scaled =
-        Math.round(
-          Math.abs(
-            Number(quote)
-          ) *
-            Math.pow(10, p)
-        );
-
-      return scaled % 10;
-    }
-
-
-    /*
-    ======================================================
-    FORMAT QUOTE
-    ======================================================
-    */
-
-    function formatQuote(
-      quote,
-      precision
-    ) {
-      const p =
-        Math.max(
-          0,
-          Math.min(
-            10,
-            Number(precision) || 0
-          )
-        );
-
-      return Number(
-        quote
-      ).toFixed(p);
-    }
-
-
-    /*
-    ======================================================
-    ANALYZER
-    ======================================================
-    */
-
-    function runAnalyzer() {
-      /*
-      Require at least 20 observations.
-      */
-      if (ticks.length < 20) {
-        signalText.textContent =
-          `Collecting ticks... ${ticks.length}/20`;
-
-        analysisScore.textContent =
-          "—";
-
-        return;
-      }
-
-      /*
-      Existing signal remains frozen for 60 seconds.
-      */
-      if (
-        signalDigit !== null &&
-        Date.now() -
-          signalStartedAt <
-          SIGNAL_DURATION
-      ) {
-        updateSignalTimer();
-        return;
-      }
-
-      /*
-      Use recent observations for the analysis.
-      */
-      const recent =
-        ticks.slice(-50);
-
-      const localCounts =
-        Array(10).fill(0);
-
-      for (const item of recent) {
-        const digit =
-          extractLastDigit(
-            item.quote,
-            selectedPrecision
-          );
-
-        if (digit !== null) {
-          localCounts[digit]++;
-        }
-      }
-
-      const total =
-        localCounts.reduce(
-          (sum, value) =>
-            sum + value,
-          0
-        );
-
-      if (total < 20) {
-        return;
-      }
-
-      /*
-      Choose the strongest observed digit.
-
-      This is an analysis score, NOT a guaranteed
-      probability and NOT a promise of outcome.
-      */
-      let bestDigit = 0;
-      let bestCount =
-        localCounts[0];
-
-      for (
-        let digit = 1;
-        digit <= 9;
-        digit++
-      ) {
-        if (
-          localCounts[digit] >
-          bestCount
-        ) {
-          bestDigit = digit;
-          bestCount =
-            localCounts[digit];
-        }
-      }
-
-      const score =
-        Math.round(
-          (bestCount / total) *
-            100
-        );
-
-      signalDigit =
-        bestDigit;
-
-      signalStartedAt =
-        Date.now();
-
-      predictedDigit.textContent =
-        String(bestDigit);
-
-      analysisScore.textContent =
-        `${score}/100`;
-
-      signalText.textContent =
-        `Analysis signal: ${bestDigit}`;
-
-      highlightDigit(
-        bestDigit
-      );
-
-      startSignalTimer();
-
-      addHistoryEntry({
-        digit: bestDigit,
-        score,
-        market:
-          selectedMarketName,
-        contract:
-          contractSelect.value,
-        barrier:
-          barrierSelect.value,
-        time:
-          new Date().toISOString(),
-        result:
-          "PENDING"
-      });
-    }
-
-
-    /*
-    ======================================================
-    SIGNAL TIMER
-    ======================================================
-    */
-
-    function startSignalTimer() {
-      stopSignalTimer();
-
-      updateSignalTimer();
-
-      signalTimer =
-        setInterval(
-          updateSignalTimer,
-          250
-        );
-    }
-
-
-    function updateSignalTimer() {
-      if (
-        signalDigit === null
-      ) {
-        timerProgress.style.width =
-          "0%";
-
-        timerText.textContent =
-          "Signal inactive";
-
-        return;
-      }
-
-      const elapsed =
-        Date.now() -
-        signalStartedAt;
-
-      const remaining =
-        Math.max(
-          0,
-          SIGNAL_DURATION -
-            elapsed
-        );
-
-      const percentage =
-        Math.max(
-          0,
-          Math.min(
-            100,
-            (remaining /
-              SIGNAL_DURATION) *
-              100
-          )
-        );
-
-      timerProgress.style.width =
-        `${percentage}%`;
-
-      timerText.textContent =
-        `${Math.ceil(
-          remaining / 1000
-        )}s signal remaining`;
-
-      if (remaining <= 0) {
-        signalDigit = null;
-
-        stopSignalTimer();
-
-        predictedDigit.textContent =
-          "—";
-
-        signalText.textContent =
-          "Signal expired — monitoring";
-
-        timerProgress.style.width =
-          "0%";
-
-        timerText.textContent =
-          "Waiting for next signal";
-
-        document
-          .querySelectorAll(
-            ".digit-card"
-          )
-          .forEach((card) => {
-            card.classList.remove(
-              "selected"
-            );
-          });
-      }
-    }
-
-
-    function stopSignalTimer() {
-      if (signalTimer) {
-        clearInterval(
-          signalTimer
-        );
-
-        signalTimer = null;
-      }
-    }
-
-
-    /*
-    ======================================================
-    DIGIT DISPLAY
-    ======================================================
-    */
-
-    function updateAllDisplay() {
-      tickCount.textContent =
-        String(totalTicks);
-
-      liveTickCount.textContent =
-        String(totalTicks);
-
-      frequencyInfo.textContent =
-        `${totalTicks} ticks`;
-
-      updateFrequencyDisplay();
-    }
-
-
-    function updateFrequencyDisplay() {
-      const max =
-        Math.max(
-          1,
-          ...counts
-        );
-
-      document
-        .querySelectorAll(
-          ".digit-card"
-        )
-        .forEach((card) => {
-          const digit =
-            Number(
-              card.dataset.digit
-            );
-
-          const count =
-            counts[digit] || 0;
-
-          const countElement =
-            card.querySelector(
-              ".digit-count"
-            );
-
-          const bar =
-            card.querySelector(
-              ".digit-bar span"
-            );
-
-          countElement.textContent =
-            String(count);
-
-          bar.style.width =
-            `${(count / max) * 100}%`;
-        });
-    }
-
-
-    function renderDigitCounts() {
-      updateAllDisplay();
-    }
-
-
-    function highlightDigit(
-      digit
-    ) {
-      document
-        .querySelectorAll(
-          ".digit-card"
-        )
-        .forEach((card) => {
-          card.classList.toggle(
-            "selected",
-            Number(
-              card.dataset.digit
-            ) === digit
-          );
-        });
-    }
-
-
-    /*
-    ======================================================
-    MATCHES ACTIVATION
-    ======================================================
-    */
-
-    activateMatchesBtn.addEventListener(
-      "click",
-      activateMatches
+    setConnectionStatus(
+      "MARKET CHANGED",
+      "wait"
     );
 
-    async function activateMatches() {
-      const code =
-        matchesCode.value.trim();
+    startButton.disabled = false;
+    stopButton.disabled = true;
 
-      if (!code) {
-        showToast(
-          "Enter activation code."
+    marketSelect.disabled = false;
+    contractSelect.disabled = false;
+
+    showDontTrade(
+      "Market changed. Previous entry cancelled. Press START for a fresh analysis."
+    );
+
+  }
+);
+
+
+/* =========================================================
+   CONTRACT CHANGE
+========================================================= */
+
+contractSelect.addEventListener(
+  "change",
+  () => {
+
+    const newContract =
+      contractSelect.value;
+
+    if (
+      newContract === "MATCHES" &&
+      !matchesUnlocked
+    ) {
+
+      matchesUnlockBox.classList.remove(
+        "hidden"
+      );
+
+      contractSelect.value =
+        currentContract;
+
+      return;
+    }
+
+    currentContract =
+      newContract;
+
+    updateBarrierVisibility();
+
+    stopCurrentSignal();
+    clearTimer();
+    resetEntryBox();
+
+    if (running) {
+
+      showDontTrade(
+        "Contract changed. Previous entry cancelled. Wait for a new signal."
+      );
+    }
+
+  }
+);
+
+
+/* =========================================================
+   BARRIER
+========================================================= */
+
+function updateBarrierVisibility() {
+
+  const contract =
+    contractSelect.value;
+
+  if (
+    contract === "OVER" ||
+    contract === "UNDER"
+  ) {
+
+    barrierBox.classList.remove(
+      "hidden"
+    );
+
+  } else {
+
+    barrierBox.classList.add(
+      "hidden"
+    );
+  }
+}
+
+updateBarrierVisibility();
+
+
+barrierSelect.addEventListener(
+  "change",
+  () => {
+
+    stopCurrentSignal();
+    clearTimer();
+    resetEntryBox();
+
+    if (running) {
+
+      showDontTrade(
+        "Barrier changed. Previous entry cancelled. Wait for a new signal."
+      );
+    }
+
+  }
+);
+
+
+/* =========================================================
+   MATCHES UNLOCK
+========================================================= */
+
+unlockMatches.addEventListener(
+  "click",
+  async () => {
+
+    unlockMessage.textContent = "";
+
+    const code =
+      matchesCode.value.trim();
+
+    if (!code) {
+
+      unlockMessage.textContent =
+        "Enter the activation code.";
+
+      return;
+    }
+
+    unlockMatches.disabled = true;
+    unlockMatches.textContent =
+      "CHECKING...";
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/unlock-matches",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({
+              code
+            })
+          }
         );
+
+      const data =
+        await response
+          .json()
+          .catch(() => ({}));
+
+      if (!response.ok) {
+
+        unlockMessage.textContent =
+          data.message ||
+          "Activation failed.";
 
         return;
       }
 
-      activateMatchesBtn.disabled =
-        true;
+      matchesUnlocked = true;
 
-      activateMatchesBtn.textContent =
-        "CHECKING...";
+      matchesOption.textContent =
+        "MATCHES";
 
-      try {
-        const response =
-          await fetch(
-            "/api/unlock-matches",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-              credentials:
-                "same-origin",
-              body: JSON.stringify({
-                code
-              })
-            }
-          );
+      matchesOption.classList.remove(
+        "locked"
+      );
 
-        const data =
-          await response.json();
+      matchesUnlockBox.classList.add(
+        "hidden"
+      );
 
-        if (
-          !response.ok ||
-          !data.ok
-        ) {
-          throw new Error(
-            data.message ||
-              "Activation failed."
-          );
-        }
+      contractSelect.value =
+        "MATCHES";
 
-        matchesUnlocked = true;
+      currentContract =
+        "MATCHES";
 
-        updateMatchesUI();
+      updateBarrierVisibility();
 
-        showToast(
-          "MATCHES activated."
-        );
+      unlockMessage.textContent =
+        "MATCHES activated.";
 
-      } catch (error) {
-        showToast(
-          error.message ||
-            "Activation failed."
-        );
-      } finally {
-        activateMatchesBtn.disabled =
-          false;
+    } catch (error) {
 
-        activateMatchesBtn.textContent =
-          "ACTIVATE";
-      }
+      console.error(
+        "MATCHES unlock error:",
+        error
+      );
+
+      unlockMessage.textContent =
+        "Could not activate MATCHES.";
+
+    } finally {
+
+      unlockMatches.disabled = false;
+      unlockMatches.textContent =
+        "UNLOCK";
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+startButton.addEventListener(
+  "click",
+  () => {
+
+    prepareAudio();
+
+    const market =
+      marketSelect.value;
+
+    if (!market) {
+
+      alert(
+        "Please select a market."
+      );
+
+      return;
     }
 
 
-    function updateMatchesUI() {
-      if (matchesUnlocked) {
-        matchesStatus.textContent =
-          "MATCHES is activated.";
+    if (
+      contractSelect.value ===
+        "MATCHES" &&
+      !matchesUnlocked
+    ) {
 
-        matchesStatus.style.color =
-          "var(--green)";
+      matchesUnlockBox.classList.remove(
+        "hidden"
+      );
 
-        const option =
-          contractSelect.querySelector(
-            'option[value="MATCHES"]'
-          );
-
-        if (option) {
-          option.textContent =
-            "MATCHES";
-        }
-
-      } else {
-        matchesStatus.textContent =
-          "MATCHES is locked.";
-
-        matchesStatus.style.color =
-          "";
-
-        const option =
-          contractSelect.querySelector(
-            'option[value="MATCHES"]'
-          );
-
-        if (option) {
-          option.textContent =
-            "MATCHES 🔒";
-        }
-      }
+      return;
     }
 
 
     /*
-    ======================================================
-    HISTORY
-    ======================================================
-    */
+     * IMPORTANT FIX:
+     *
+     * Do NOT wait a fixed 500ms.
+     * Wait for the actual WebSocket OPEN event.
+     */
 
-    function addHistoryEntry(
-      entry
+    if (
+      !socket ||
+      socket.readyState !== WebSocket.OPEN
     ) {
-      historyData.unshift(
-        entry
+
+      pendingStart = true;
+
+      connectBrowserSocket();
+
+      setConnectionStatus(
+        "WAITING FOR SERVER",
+        "wait"
       );
 
-      /*
-      Keep last 30.
-      */
-      historyData =
-        historyData.slice(0, 30);
-
-      localStorage.setItem(
-        "derivLiveEntryHistory",
-        JSON.stringify(
-          historyData
-        )
-      );
-
-      renderHistory();
+      return;
     }
 
+    startMarket();
 
-    function loadHistory() {
+  }
+);
+
+
+/* =========================================================
+   START MARKET
+========================================================= */
+
+function startMarket() {
+
+  if (
+    !socket ||
+    socket.readyState !== WebSocket.OPEN
+  ) {
+
+    pendingStart = true;
+
+    connectBrowserSocket();
+
+    return;
+  }
+
+
+  const market =
+    marketSelect.value;
+
+  if (!market) {
+    return;
+  }
+
+
+  /*
+   * Completely fresh analysis.
+   */
+
+  stopCurrentSignal();
+  clearTimer();
+  resetAnalysis();
+
+  currentMarket =
+    market;
+
+  currentSymbol = "";
+
+  currentPrecision = null;
+
+  running = true;
+
+  pendingStart = false;
+
+  startButton.disabled = true;
+  stopButton.disabled = false;
+
+  marketSelect.disabled = true;
+  contractSelect.disabled = true;
+
+  setConnectionStatus(
+    "CONNECTING TO DERIV",
+    "wait"
+  );
+
+  liveMarket.textContent =
+    `CONNECTING • ${market}`;
+
+  momentumMarket.textContent =
+    `Waiting for fresh ${market} ticks...`;
+
+  hideDontTrade();
+
+
+  try {
+
+    socket.send(
+      JSON.stringify({
+        action: "start",
+        marketName: market
+      })
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Unable to start market:",
+      error
+    );
+
+    running = false;
+
+    startButton.disabled = false;
+    stopButton.disabled = true;
+
+    marketSelect.disabled = false;
+    contractSelect.disabled = false;
+
+    showDontTrade(
+      "Could not start the market connection."
+    );
+
+  }
+}
+
+
+/* =========================================================
+   STOP
+========================================================= */
+
+stopButton.addEventListener(
+  "click",
+  () => {
+
+    running = false;
+
+    pendingStart = false;
+
+    stopCurrentSignal();
+    clearTimer();
+    resetAnalysis();
+
+    if (
+      socket &&
+      socket.readyState === WebSocket.OPEN
+    ) {
+
       try {
-        const saved =
-          localStorage.getItem(
-            "derivLiveEntryHistory"
-          );
 
-        if (!saved) {
+        socket.send(
+          JSON.stringify({
+            action: "stop"
+          })
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Stop error:",
+          error
+        );
+      }
+    }
+
+    currentSymbol = "";
+
+    startButton.disabled = false;
+    stopButton.disabled = true;
+
+    marketSelect.disabled = false;
+    contractSelect.disabled = false;
+
+    setConnectionStatus(
+      "STOPPED",
+      "wait"
+    );
+
+    liveMarket.textContent =
+      marketSelect.value
+        ? `SELECTED • ${marketSelect.value}`
+        : "No market selected";
+
+  }
+);
+
+
+/* =========================================================
+   PROCESS TICK
+========================================================= */
+
+function processTick(data) {
+
+  ticks.push(data);
+
+  if (
+    ticks.length > MAX_DIGITS
+  ) {
+
+    ticks.shift();
+  }
+
+
+  const precision =
+    Number.isInteger(data.precision)
+      ? data.precision
+      : currentPrecision;
+
+
+  const digit =
+    getLastDigit(
+      data.quote,
+      precision
+    );
+
+
+  if (digit === null) {
+    return;
+  }
+
+
+  digits.push(digit);
+
+  if (
+    digits.length > MAX_DIGITS
+  ) {
+
+    digits.shift();
+  }
+
+
+  tickCount.textContent =
+    digits.length;
+
+  lastDigit.textContent =
+    digit;
+
+  updateMomentum();
+  renderDigitHistory();
+
+
+  /*
+   * Analyze only when enough fresh ticks exist.
+   *
+   * IMPORTANT:
+   * A signal is not recreated repeatedly from the
+   * same history after expiry. A fresh analysis cycle
+   * begins only after enough new ticks are collected.
+   */
+
+  if (
+    digits.length >= MIN_TICKS_FOR_ANALYSIS &&
+    !currentSignal
+  ) {
+
+    analyzeForEntry();
+  }
+}
+
+
+/* =========================================================
+   LAST DIGIT
+========================================================= */
+
+function getLastDigit(
+  quote,
+  precision
+) {
+
+  if (
+    quote === null ||
+    quote === undefined
+  ) {
+
+    return null;
+  }
+
+
+  let text = "";
+
+
+  const numeric =
+    Number(quote);
+
+
+  if (
+    Number.isFinite(numeric) &&
+    Number.isInteger(precision) &&
+    precision >= 0 &&
+    precision <= 10
+  ) {
+
+    text =
+      numeric.toFixed(precision);
+
+  } else {
+
+    text =
+      String(quote);
+  }
+
+
+  for (
+    let i = text.length - 1;
+    i >= 0;
+    i--
+  ) {
+
+    if (
+      text[i] >= "0" &&
+      text[i] <= "9"
+    ) {
+
+      return Number(text[i]);
+    }
+  }
+
+
+  return null;
+}
+
+
+/* =========================================================
+   DIGIT PERCENTAGES
+========================================================= */
+
+function getDigitPercentages() {
+
+  const counts =
+    Array(10).fill(0);
+
+  for (const digit of digits) {
+
+    if (
+      Number.isInteger(digit) &&
+      digit >= 0 &&
+      digit <= 9
+    ) {
+
+      counts[digit]++;
+    }
+  }
+
+
+  const total =
+    digits.length;
+
+
+  return counts.map(
+    count =>
+      total
+        ? (count / total) * 100
+        : 0
+  );
+}
+
+
+/* =========================================================
+   MOMENTUM SCORES
+========================================================= */
+
+function getMomentumScores() {
+
+  const percentages =
+    getDigitPercentages();
+
+
+  const recent =
+    digits.slice(-20);
+
+
+  const recentCounts =
+    Array(10).fill(0);
+
+
+  for (const digit of recent) {
+
+    recentCounts[digit]++;
+  }
+
+
+  const recentTotal =
+    recent.length;
+
+
+  const recentPercentages =
+    recentCounts.map(
+      count =>
+        recentTotal
+          ? (count / recentTotal) * 100
+          : 0
+    );
+
+
+  return percentages.map(
+    (value, digit) =>
+      value * 0.55 +
+      recentPercentages[digit] * 0.45
+  );
+}
+
+
+/* =========================================================
+   UPDATE MOMENTUM
+========================================================= */
+
+function updateMomentum() {
+
+  const scores =
+    getMomentumScores();
+
+
+  const max =
+    Math.max(...scores);
+
+
+  scores.forEach(
+    (score, digit) => {
+
+      const circle =
+        document.getElementById(
+          `digitCircle${digit}`
+        );
+
+      const percent =
+        document.getElementById(
+          `digitPercent${digit}`
+        );
+
+
+      percent.textContent =
+        `${score.toFixed(1)}%`;
+
+
+      circle.classList.remove(
+        "green",
+        "blue",
+        "yellow",
+        "red"
+      );
+
+
+      const relative =
+        max > 0
+          ? score / max
+          : 0;
+
+
+      if (relative >= 0.75) {
+
+        circle.classList.add(
+          "green"
+        );
+
+      } else if (relative >= 0.50) {
+
+        circle.classList.add(
+          "blue"
+        );
+
+      } else if (relative >= 0.30) {
+
+        circle.classList.add(
+          "yellow"
+        );
+
+      } else {
+
+        circle.classList.add(
+          "red"
+        );
+      }
+
+
+      circle.classList.add(
+        "pulse"
+      );
+
+
+      setTimeout(() => {
+
+        circle.classList.remove(
+          "pulse"
+        );
+
+      }, 180);
+
+    }
+  );
+}
+
+
+/* =========================================================
+   ANALYZE CONTRACT
+========================================================= */
+
+function analyzeForEntry() {
+
+  if (
+    digits.length <
+    MIN_TICKS_FOR_ANALYSIS
+  ) {
+
+    return;
+  }
+
+
+  const scores =
+    getMomentumScores();
+
+
+  const ranked =
+    scores
+      .map(
+        (score, digit) => ({
+          digit,
+          score
+        })
+      )
+      .sort(
+        (a, b) =>
+          b.score - a.score
+      );
+
+
+  const contract =
+    contractSelect.value;
+
+
+  let candidates = [];
+  let analysisReason = "";
+
+
+  if (contract === "ODD") {
+
+    candidates =
+      ranked.filter(
+        item =>
+          item.digit % 2 === 1
+      );
+
+    analysisReason =
+      "The strongest live odd-digit momentum is leading the current analysis.";
+  }
+
+
+  else if (contract === "EVEN") {
+
+    candidates =
+      ranked.filter(
+        item =>
+          item.digit % 2 === 0
+      );
+
+    analysisReason =
+      "The strongest live even-digit momentum is leading the current analysis.";
+  }
+
+
+  else if (contract === "OVER") {
+
+    const barrier =
+      Number(
+        barrierSelect.value
+      );
+
+    candidates =
+      ranked.filter(
+        item =>
+          item.digit > barrier
+      );
+
+    analysisReason =
+      `Live momentum currently favors digits above barrier ${barrier}.`;
+  }
+
+
+  else if (contract === "UNDER") {
+
+    const barrier =
+      Number(
+        barrierSelect.value
+      );
+
+    candidates =
+      ranked.filter(
+        item =>
+          item.digit < barrier
+      );
+
+    analysisReason =
+      `Live momentum currently favors digits below barrier ${barrier}.`;
+  }
+
+
+  else if (contract === "DIFFERS") {
+
+    candidates =
+      ranked.slice(0, 4);
+
+    analysisReason =
+      "These digits currently show the strongest live momentum candidates for a DIFFERS setup.";
+  }
+
+
+  else if (contract === "MATCHES") {
+
+    if (!matchesUnlocked) {
+      return;
+    }
+
+    candidates =
+      ranked.slice(0, 3);
+
+    analysisReason =
+      "These digits currently have the strongest live momentum for a MATCHES setup.";
+  }
+
+
+  if (!candidates.length) {
+    return;
+  }
+
+
+  const top =
+    candidates.slice(0, 3);
+
+
+  const strongest =
+    top[0];
+
+
+  const second =
+    top[1];
+
+
+  const separation =
+    second
+      ? strongest.score - second.score
+      : strongest.score;
+
+
+  const score =
+    Math.min(
+      95,
+      Math.max(
+        50,
+        50 +
+        strongest.score * 1.7 +
+        separation * 0.8
+      )
+    );
+
+
+  analysisScore.textContent =
+    score.toFixed(0);
+
+
+  if (
+    score <
+    SIGNAL_SCORE_THRESHOLD
+  ) {
+
+    return;
+  }
+
+
+  createEntrySignal({
+    contract,
+    digits:
+      top.map(
+        item =>
+          item.digit
+      ),
+    score,
+    reason:
+      analysisReason
+  });
+}
+
+
+/* =========================================================
+   CREATE SIGNAL
+========================================================= */
+
+function createEntrySignal({
+  contract,
+  digits: predictedDigits,
+  score,
+  reason: signalReason
+}) {
+
+  if (currentSignal) {
+    return;
+  }
+
+
+  if (
+    !running ||
+    !currentMarket ||
+    !currentSymbol
+  ) {
+
+    return;
+  }
+
+
+  signalSequence++;
+
+
+  currentSignal = {
+
+    id:
+      signalSequence,
+
+    market:
+      currentMarket,
+
+    symbol:
+      currentSymbol,
+
+    contract,
+
+    digits:
+      predictedDigits,
+
+    score,
+
+    reason:
+      signalReason,
+
+    createdAt:
+      Date.now(),
+
+    status:
+      "ACTIVE"
+
+  };
+
+
+  analysisScore.textContent =
+    score.toFixed(0);
+
+
+  entryContract.textContent =
+    contract;
+
+
+  if (
+    contract === "OVER" ||
+    contract === "UNDER"
+  ) {
+
+    const barrier =
+      Number(
+        barrierSelect.value
+      );
+
+    prediction.textContent =
+      `${contract} ${barrier}`;
+
+    manualHelp.textContent =
+      `Manual: choose ${contract} and set barrier ${barrier} on Deriv.`;
+
+  } else {
+
+    prediction.textContent =
+      predictedDigits.join(" • ");
+
+    manualHelp.textContent =
+      `Manual: choose ${contract} and enter/select one of the shown digit(s) on Deriv.`;
+  }
+
+
+  reason.textContent =
+    signalReason;
+
+
+  manualTradeButton.disabled =
+    false;
+
+
+  hideDontTrade();
+
+
+  startEntryTimer(
+    currentSignal.id
+  );
+
+
+  playSignalSound();
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function startEntryTimer(signalId) {
+
+  clearTimer();
+
+  entrySeconds = 60;
+
+  timer.classList.remove(
+    "warning",
+    "expired"
+  );
+
+  timer.classList.add(
+    "active"
+  );
+
+  timerValue.textContent =
+    `${entrySeconds}s`;
+
+
+  entryTimer =
+    setInterval(
+      () => {
+
+        if (
+          !currentSignal ||
+          currentSignal.id !== signalId
+        ) {
+
+          clearTimer();
           return;
         }
 
-        const parsed =
-          JSON.parse(saved);
 
-        if (
-          Array.isArray(parsed)
-        ) {
-          historyData =
-            parsed.slice(0, 30);
+        if (!running) {
+
+          clearTimer();
+          return;
         }
 
-      } catch (error) {
-        historyData = [];
-      }
 
-      renderHistory();
-    }
+        entrySeconds--;
 
 
-    function renderHistory() {
-      historyList.innerHTML = "";
+        if (
+          entrySeconds <= 0
+        ) {
 
-      if (
-        historyData.length === 0
-      ) {
-        historyList.innerHTML =
-          `
-          <div class="history-empty">
-            No analysis signals recorded yet.
-          </div>
-          `;
+          clearTimer();
 
-        return;
-      }
+          finishEntryWindow(
+            signalId
+          );
 
-      historyData.forEach(
-        (entry, index) => {
-          const item =
-            document.createElement(
-              "div"
-            );
+          return;
+        }
 
-          item.className =
-            "history-item";
 
-          const digit =
-            document.createElement(
-              "div"
-            );
+        timerValue.textContent =
+          `${entrySeconds}s`;
 
-          digit.className =
-            "history-digit";
 
-          digit.textContent =
-            String(
-              entry.digit ?? "—"
-            );
+        if (
+          entrySeconds <= 10
+        ) {
 
-          const info =
-            document.createElement(
-              "div"
-            );
+          timer.classList.remove(
+            "active"
+          );
 
-          info.className =
-            "history-info";
+          timer.classList.add(
+            "warning"
+          );
+        }
 
-          const title =
-            document.createElement(
-              "strong"
-            );
+      },
+      1000
+    );
+}
 
-          title.textContent =
-            `${entry.market || "Market"} • ${
-              entry.contract || "Analysis"
-            }`;
 
-          const details =
+/* =========================================================
+   TIMER FINISHED
+========================================================= */
+
+function finishEntryWindow(signalId) {
+
+  if (
+    !currentSignal ||
+    currentSignal.id !== signalId
+  ) {
+
+    return;
+  }
+
+
+  currentSignal.status =
+    "EXPIRED";
+
+
+  manualTradeButton.disabled =
+    true;
+
+
+  timer.classList.remove(
+    "active",
+    "warning"
+  );
+
+  timer.classList.add(
+    "expired"
+  );
+
+
+  timerValue.textContent =
+    "0s";
+
+
+  showDontTrade(
+    "Entry time finished. Wait for a new confirmed signal."
+  );
+
+
+  currentSignal = null;
+
+
+  resetEntryBoxOnly();
+
+
+  /*
+   * IMPORTANT:
+   *
+   * Keep the remaining history temporarily.
+   * But require NEW ticks before another signal.
+   */
+  digits = [];
+  ticks = [];
+
+  tickCount.textContent = "0";
+  lastDigit.textContent = "—";
+  analysisScore.textContent = "—";
+
+  digitHistory.textContent =
+    "Waiting for fresh live ticks...";
+
+  updateMomentum();
+}
+
+
+/* =========================================================
+   STOP CURRENT SIGNAL
+========================================================= */
+
+function stopCurrentSignal() {
+
+  if (currentSignal) {
+
+    currentSignal.status =
+      "CANCELLED";
+  }
+
+
+  currentSignal = null;
+
+  manualTradeButton.disabled =
+    true;
+}
+
+
+/* =========================================================
+   CLEAR TIMER
+========================================================= */
+
+function clearTimer() {
+
+  if (entryTimer) {
+
+    clearInterval(
+      entryTimer
+    );
+
+    entryTimer = null;
+  }
+
+
+  entrySeconds = 0;
+
+
+  timer.classList.remove(
+    "active",
+    "warning",
+    "expired"
+  );
+
+
+  timerValue.textContent =
+    "—";
+}
+
+
+/* =========================================================
+   RESET ANALYSIS
+========================================================= */
+
+function resetAnalysis() {
+
+  ticks = [];
+  digits = [];
+
+  tickCount.textContent =
+    "0";
+
+  lastDigit.textContent =
+    "—";
+
+  analysisScore.textContent =
+    "—";
+
+  digitHistory.textContent =
+    "Waiting for fresh live ticks...";
+
+  resetEntryBox();
+
+  updateMomentum();
+}
+
+
+/* =========================================================
+   RESET ENTRY
+========================================================= */
+
+function resetEntryBox() {
+
+  entryContract.textContent =
+    "WAITING FOR CONFIRMED ENTRY";
+
+  prediction.textContent =
+    "—";
+
+  reason.textContent =
+    "The analyzer is waiting for enough live ticks.";
+
+  manualHelp.textContent =
+    "No manual entry yet.";
+
+  manualTradeButton.disabled =
+    true;
+}
+
+
+function resetEntryBoxOnly() {
+
+  entryContract.textContent =
+    "ENTRY FINISHED";
+
+  prediction.textContent =
+    "—";
+
+  reason.textContent =
+    "Wait for a new confirmed signal.";
+
+  manualHelp.textContent =
+    "Do not use the previous entry.";
+
+  manualTradeButton.disabled =
+    true;
+}
+
+
+/* =========================================================
+   DON'T TRADE
+========================================================= */
+
+function showDontTrade(message) {
+
+  dontMessage.textContent =
+    message;
+
+  dontTrade.classList.add(
+    "show"
+  );
+}
+
+
+function hideDontTrade() {
+
+  dontTrade.classList.remove(
+    "show"
+  );
+}
+
+
+/* =========================================================
+   DIGIT HISTORY
+========================================================= */
+
+function renderDigitHistory() {
+
+  if (!digits.length) {
+
+    digitHistory.textContent =
+      "No ticks yet.";
+
+    return;
+  }
+
+
+  const recent =
+    digits.slice(-30);
+
+
+  digitHistory.innerHTML =
+    recent
+      .map(
+        digit => {
+
+          const span =
             document.createElement(
               "span"
             );
 
-          const score =
-            entry.score !== undefined
-              ? `Score ${entry.score}/100`
-              : "Analysis";
+          span.style.display =
+            "inline-flex";
 
-          details.textContent =
-            `${score} • ${
-              formatHistoryTime(
-                entry.time
-              )
-            } • ${
-              entry.result || "PENDING"
-            }`;
+          span.style.alignItems =
+            "center";
 
-          info.appendChild(title);
-          info.appendChild(details);
+          span.style.justifyContent =
+            "center";
 
-          const controls =
-            document.createElement(
-              "div"
+          span.style.width =
+            "28px";
+
+          span.style.height =
+            "28px";
+
+          span.style.margin =
+            "3px";
+
+          span.style.borderRadius =
+            "50%";
+
+          span.style.background =
+            "#13263e";
+
+          span.style.fontWeight =
+            "800";
+
+          span.textContent =
+            digit;
+
+          return span.outerHTML;
+        }
+      )
+      .join("");
+}
+
+
+/* =========================================================
+   MANUAL TRADE
+========================================================= */
+
+manualTradeButton.addEventListener(
+  "click",
+  () => {
+
+    if (!currentSignal) {
+      return;
+    }
+
+
+    if (entrySeconds <= 0) {
+      return;
+    }
+
+
+    const signal =
+      currentSignal;
+
+
+    if (
+      signal.market !== currentMarket ||
+      signal.symbol !== currentSymbol
+    ) {
+
+      showDontTrade(
+        "Market changed. This entry is no longer valid."
+      );
+
+      stopCurrentSignal();
+      clearTimer();
+
+      return;
+    }
+
+
+    const record = {
+
+      id:
+        Date.now(),
+
+      market:
+        signal.market,
+
+      symbol:
+        signal.symbol,
+
+      contract:
+        signal.contract,
+
+      digits:
+        signal.digits,
+
+      score:
+        Number(
+          signal.score.toFixed(1)
+        ),
+
+      reason:
+        signal.reason,
+
+      entryTime:
+        new Date().toISOString(),
+
+      result:
+        "PENDING"
+    };
+
+
+    saveTrade(record);
+
+
+    alert(
+      "Manual trade recorded. Place the trade yourself on Deriv."
+    );
+  }
+);
+
+
+/* =========================================================
+   TRADE STORAGE
+========================================================= */
+
+function getTrades() {
+
+  try {
+
+    const raw =
+      localStorage.getItem(
+        "derivLiveEntryTrades"
+      );
+
+    const parsed =
+      JSON.parse(
+        raw || "[]"
+      );
+
+    return Array.isArray(parsed)
+      ? parsed
+      : [];
+
+  } catch {
+
+    return [];
+  }
+}
+
+
+function saveTrade(record) {
+
+  const trades =
+    getTrades();
+
+
+  trades.unshift(record);
+
+
+  localStorage.setItem(
+    "derivLiveEntryTrades",
+    JSON.stringify(
+      trades.slice(0, 100)
+    )
+  );
+
+
+  renderTradeHistory();
+}
+
+
+/* =========================================================
+   WIN / LOSS
+========================================================= */
+
+window.setTradeResult =
+  function setTradeResult(
+    id,
+    result
+  ) {
+
+    if (
+      result !== "WIN" &&
+      result !== "LOSS"
+    ) {
+
+      return;
+    }
+
+
+    const trades =
+      getTrades();
+
+
+    const trade =
+      trades.find(
+        item =>
+          item.id === id
+      );
+
+
+    if (!trade) {
+      return;
+    }
+
+
+    trade.result =
+      result;
+
+
+    localStorage.setItem(
+      "derivLiveEntryTrades",
+      JSON.stringify(trades)
+    );
+
+
+    renderTradeHistory();
+  };
+
+
+/* =========================================================
+   TRADE HISTORY
+========================================================= */
+
+function renderTradeHistory() {
+
+  const trades =
+    getTrades();
+
+
+  if (!trades.length) {
+
+    tradeHistory.textContent =
+      "No manual trades recorded.";
+
+    return;
+  }
+
+
+  tradeHistory.innerHTML =
+    trades
+      .map(
+        trade => {
+
+          const digitsText =
+            Array.isArray(
+              trade.digits
+            )
+              ? trade.digits.join(
+                  " • "
+                )
+              : "—";
+
+
+          const resultClass =
+            trade.result === "WIN"
+              ? "win"
+              : trade.result === "LOSS"
+                ? "loss"
+                : "";
+
+
+          const safeMarket =
+            escapeHtml(
+              trade.market
             );
 
-          controls.className =
-            "result-buttons";
+          const safeContract =
+            escapeHtml(
+              trade.contract
+            );
 
-          addResultControls(
-            controls,
-            index
-          );
+          const safeDigits =
+            escapeHtml(
+              digitsText
+            );
 
-          item.appendChild(digit);
-          item.appendChild(info);
-          item.appendChild(
-            controls
-          );
 
-          historyList.appendChild(
-            item
-          );
+          let actionHtml = "";
+
+
+          if (
+            trade.result ===
+            "PENDING"
+          ) {
+
+            actionHtml = `
+              <button
+                onclick="setTradeResult(${Number(trade.id)}, 'WIN')"
+                style="
+                  padding:6px 8px;
+                  font-size:10px;
+                  margin:2px;
+                "
+              >
+                WIN
+              </button>
+
+              <button
+                onclick="setTradeResult(${Number(trade.id)}, 'LOSS')"
+                style="
+                  padding:6px 8px;
+                  font-size:10px;
+                  background:#9b2432;
+                  margin:2px;
+                "
+              >
+                LOSS
+              </button>
+            `;
+
+          } else {
+
+            actionHtml =
+              new Date(
+                trade.entryTime
+              ).toLocaleTimeString();
+          }
+
+
+          return `
+            <div class="history-row">
+
+              <div>
+                <strong>
+                  ${safeMarket}
+                </strong>
+                <br>
+                ${safeContract}
+              </div>
+
+              <div>
+                ${safeDigits}
+                <br>
+                Score:
+                ${Number(trade.score) || 0}
+              </div>
+
+              <div class="${resultClass}">
+                ${escapeHtml(trade.result)}
+              </div>
+
+              <div>
+                ${actionHtml}
+              </div>
+
+            </div>
+          `;
         }
-      );
+      )
+      .join("");
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+}
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+let audioContext = null;
+
+
+function prepareAudio() {
+
+  try {
+
+    if (!audioContext) {
+
+      audioContext =
+        new (
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
     }
 
 
-    function addResultControls(
-      container,
-      index
+    if (
+      audioContext.state ===
+      "suspended"
     ) {
-      const win =
-        document.createElement(
-          "button"
-        );
 
-      win.className =
-        "result-btn win";
+      audioContext.resume();
+    }
 
-      win.textContent =
-        "WIN";
+  } catch {}
+}
 
-      win.type = "button";
 
-      win.addEventListener(
-        "click",
-        () => {
-          setHistoryResult(
-            index,
-            "WIN"
-          );
-        }
-      );
+function playSignalSound() {
 
-      const loss =
-        document.createElement(
-          "button"
-        );
+  try {
 
-      loss.className =
-        "result-btn loss";
-
-      loss.textContent =
-        "LOSS";
-
-      loss.type = "button";
-
-      loss.addEventListener(
-        "click",
-        () => {
-          setHistoryResult(
-            index,
-            "LOSS"
-          );
-        }
-      );
-
-      container.appendChild(win);
-      container.appendChild(loss);
+    if (!audioContext) {
+      return;
     }
 
 
-    function setHistoryResult(
-      index,
-      result
-    ) {
-      if (
-        !historyData[index]
-      ) {
-        return;
-      }
+    const oscillator =
+      audioContext.createOscillator();
 
-      historyData[index].result =
-        result;
-
-      localStorage.setItem(
-        "derivLiveEntryHistory",
-        JSON.stringify(
-          historyData
-        )
-      );
-
-      renderHistory();
-    }
+    const gain =
+      audioContext.createGain();
 
 
-    function formatHistoryTime(
-      value
-    ) {
-      try {
-        return new Date(
-          value
-        ).toLocaleTimeString();
-      } catch (_) {
-        return "—";
-      }
-    }
+    oscillator.frequency.value =
+      880;
+
+    oscillator.type =
+      "sine";
 
 
-    /*
-    ======================================================
-    ERRORS
-    ======================================================
-    */
-
-    function handleDerivError(
-      data
-    ) {
-      const message =
-        data.message ||
-        "Deriv error.";
-
-      streamStatus.textContent =
-        "ERROR";
-
-      showToast(message);
-
-      console.error(
-        "Deriv error:",
-        message
-      );
-
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-    }
+    gain.gain.setValueAtTime(
+      0.001,
+      audioContext.currentTime
+    );
 
 
-    function handleMarketNotFound(
-      data
-    ) {
-      streamStatus.textContent =
-        "MARKET NOT FOUND";
-
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-
-      showToast(
-        data.message ||
-          "Selected market is not active."
-      );
-    }
+    gain.gain.exponentialRampToValueAtTime(
+      0.15,
+      audioContext.currentTime + 0.02
+    );
 
 
-    function handleClosed(
-      data
-    ) {
-      streamStatus.textContent =
-        "CLOSED";
-
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-
-      stopSignalTimer();
-
-      showToast(
-        data.message ||
-          "Live connection closed."
-      );
-    }
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      audioContext.currentTime + 0.3
+    );
 
 
-    /*
-    ======================================================
-    INITIALIZATION
-    ======================================================
-    */
+    oscillator.connect(gain);
 
-    updateBarrierVisibility();
+    gain.connect(
+      audioContext.destination
+    );
 
-    updateMatchesUI();
 
-    loadHistory();
+    oscillator.start();
 
-    checkSession();
 
-  </script>
+    oscillator.stop(
+      audioContext.currentTime + 0.3
+    );
+
+  } catch {}
+}
+
+
+/* =========================================================
+   INITIAL
+========================================================= */
+
+renderTradeHistory();
+
+updateBarrierVisibility();
+
+updateMomentum();
+
+</script>
 
 </body>
   </html>
