@@ -1,7 +1,7 @@
 {
   "name": "deriv-live-entry",
-  "version": "1.0.0",
-  "description": "DERIV LIVE ENTRY - POWERED BY ELISY 254",
+  "version": "2.0.0",
+  "description": "DERIV LIVE ENTRY - Manual Trading Analyzer",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
